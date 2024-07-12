@@ -37,7 +37,7 @@ public class Insert {
             String EPPA_NO, String EPPA_DATE, String EPPA_DUEDT,
             String EPPA_SUNO, String EPPA_COCE, String EPPA_PAMT,
             String EPPA_PARM, String EPPA_REQBY, String EPPA_APPBY,
-            String EPPA_APPDT, String EPPA_ADVREF,  
+            String EPPA_APPDT, String EPPA_ADVREF,
             String EPPA_ADVAMT, String EPPA_REF1, String EPPA_REF2,
             String EPPA_REF3, String EPPA_STAT, String currentdate, String app,
             String cono, String divi
@@ -326,9 +326,9 @@ public class Insert {
                         ValueOfGrn[12] = itemcode;
                         double value4 = 0;
                         boolean typeGRN = false;
-                        if (cono.equalsIgnoreCase("600")) {
-                            typeGRN = checkTypeGRN(itemcode, cono);
-                        }
+//                        if (cono.equalsIgnoreCase("600")) {
+                        typeGRN = checkTypeGRN(itemcode, cono);
+//                        }
                         if (typeGRN == true) {
                             System.err.println("OFFSET");
                             String suno = itemcode;
