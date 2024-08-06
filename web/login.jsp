@@ -92,15 +92,15 @@
                         <form>
                             <a href="ManualSRN_PRV.pdf" target="_blank"><li style="color: blue;"><u>Manual</u></li></a>
                         </form> 
-                        <form>
+<!--                        <form>
                             <a href="http://192.200.9.189:8080/UserRequest/?Destination=RequestUser"><li style="color: blue;"><u>Sign Up</u></li></a>
-                        </form> 
+                        </form> -->
                         <form>
-                            <a href="http://192.200.9.189:8080/UserRequest/?Destination=PResetPW"><li style="color: blue;"><u>Reset Password</u></li></a>
+                            <a href="http://192.200.9.189:8080/UserRequest/?page=/ResetPW"><li style="color: blue;"><u>Reset Password</u></li></a>
                         </form>
-                        <form>
+<!--                        <form>
                             <a href="http://192.200.9.189:8080/UserRequest/?Destination=ChangePW"><li style="color: blue;"><u>Change Password</u></li></a>
-                        </form>
+                        </form>-->
                 </div>
             </div>
         </div>
