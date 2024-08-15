@@ -280,10 +280,12 @@
                 }).done(function (response) {
                     console.log(response);
                     response = $.grep(response, function (item) {
-                        return(!filter.RPAYMENTNO || (item.RPAYMENTNO.indexOf(filter.RPAYMENTNO) > -1))
+                        return (!filter.RStatus || (item.RStatus.indexOf(filter.RStatus) > -1))
+                                && (!filter.RPAYMENTNO || (item.RPAYMENTNO.indexOf(filter.RPAYMENTNO) > -1))
                                 && (!filter.RROWNO || (item.RROWNO.indexOf(filter.RROWNO) > -1))
                                 && (!filter.RPREMARK || (item.RPREMARK.indexOf(filter.RPREMARK) > -1))
                                 && (!filter.RSERVICENO || (item.RSERVICENO.indexOf(filter.RSERVICENO) > -1))
+                                && (!filter.RVOUCHER || (item.RVOUCHER.indexOf(filter.RVOUCHER) > -1))
                                 && (!filter.RTYPE || (item.RTYPE.indexOf(filter.RTYPE) > -1))
                                 && (!filter.RPREMARK || (item.RPREMARK.indexOf(filter.RPREMARK) > -1))
                                 && (!filter.RCOSTCENTER || (item.RCOSTCENTER.indexOf(filter.RCOSTCENTER) > -1))
@@ -291,8 +293,7 @@
                                 && (!filter.RDUEDATE || (item.RDUEDATE.indexOf(filter.RDUEDATE) > -1))
                                 && (!filter.RPAYMENT || (item.RPAYMENT.indexOf(filter.RPAYMENT) > -1))
                                 && (!filter.RDESC || (item.RDESC.indexOf(filter.RDESC) > -1))
-                                && (!filter.RAMOUNT || (item.RAMOUNT.indexOf(filter.RAMOUNT) > -1))
-                                && (!filter.RStatus || (item.RStatus.indexOf(filter.RStatus) > -1));
+                                && (!filter.RAMOUNT || (item.RAMOUNT.indexOf(filter.RAMOUNT) > -1));
                         console.log(data.resolve(response));
 
                     });
@@ -323,22 +324,28 @@
 //                $("#jsGrid").jsGrid("loadData");
             },
             updateItem: function (item) {
-//                alert(item.RDTOTA_KGS);
-                console.log(item);
+//                alert(item.RVOUCHER);
+                var voucher = item.RVOUCHER;
+                if (voucher !== null) {
+                    alert("This Payment Number has already assigned the voucher and cannot change the status");
+                    $("#jsGrid").jsGrid("loadData");
+                    return
+                }
+//                 console.log(item);
                 formData = {};
-                formData.company = item.RCOMPANY;
-                formData.customerid = item.RCUSTOMERID;
-                formData.billdate = item.RBILLDATE;
-                formData.paydate = item.RPAYDATE;
-                formData.startdate = item.RSTARTDATE;
-                formData.enddate = item.RENDDATE;
-                formData.path = "updateHeaderFinance";
+                formData.paymentno = item.RPAYMENTNO;
+                formData.cono = cono;
+                formData.divi = divi;
+                formData.status = item.RStatus;
+                formData.path = "rollbackpayment";
                 $.ajax({
                     url: './Action',
-                    type: 'POST',
+                    type: 'GET',
                     dataType: 'json',
                     data: formData,
                     async: false
+                }).done(function (response) {
+                    alert(item.RPAYMENTNO + " has Been updated");
                 });
                 $("#jsGrid").jsGrid("loadData");
             },
@@ -367,10 +374,28 @@
                     // Return an empty string to remove the delete button
                     return "";
                 }},
+            {title: "status", name: "RStatus", css: "limitext", type: "text", editing: true, align: "Right", width: 100
+                ,
+                editTemplate: function (value) {
+                    // Create an input element with a datalist for insertion
+                    var reitem = this._insertAuto = $input = $("<input>").attr("type", "text").attr("list", "itemList");
+                    var $datalist = $("<datalist>").attr("id", "itemList");
+                    // Add options to the datalist
+                    $('#itemlist').empty().append('<option value="" selected="selected">Select Year!</option>');
 
+                    $datalist.append($("<option>").attr("value", "Normal"));
+                    $datalist.append($("<option>").attr("value", "Submitted"));
+                    $datalist.append($("<option>").attr("value", "Canceled"));
+                    return $("<div>").append($input).append($datalist);
+                }, editValue: function () {
+                    var revalue = this._insertAuto.val();
+                    return revalue;
+                }
+            },
             {title: "Payment No.", name: "RPAYMENTNO", css: "limitext", type: "text", editing: false, align: "left", width: 70},
             {title: "Row No.", name: "RROWNO", css: "limitext", type: "text", editing: false, align: "left", width: 50},
             {title: "Services No/GRN No.", name: "RSERVICENO", css: "limitext", type: "text", editing: false, align: "left", width: 70},
+            {title: "Voucher", name: "RVOUCHER", css: "limitext", type: "text", editing: false, align: "left", width: 70},
             {title: "Type", name: "RTYPE", css: "limitext", type: "text", editing: false, align: "left", width: 50},
             {title: "Payment Remark", name: "RPREMARK", css: "limitext", type: "text", editing: false, align: "left", width: 250},
             {title: "Cost Center", name: "RCOSTCENTER", css: "limitext", type: "text", editing: false, align: "left", width: 250},
@@ -384,8 +409,8 @@
             {title: "Deduct Description", name: "RDESC", css: "limitext", type: "text", editing: false, align: "left", width: 100},
             {title: "Deduct Amount", name: "RAMOUNT", css: "limitext", type: "text", editing: false, align: "right", width: 100
 
-            },
-            {title: "Status", name: "RStatus", css: "limitext", type: "text", editing: false, align: "right", width: 75}
+            }
+
 
         ]
 

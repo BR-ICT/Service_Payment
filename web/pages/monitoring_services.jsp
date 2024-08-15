@@ -281,9 +281,11 @@
                 }).done(function (response) {
                     console.log(response);
                     response = $.grep(response, function (item) {
-                        return(!filter.RSERVICENO || (item.RSERVICENO.indexOf(filter.RSERVICENO) > -1))
+                        return(!filter.RStatus || (item.RStatus.indexOf(filter.RStatus) > -1))
+                                && (!filter.RSERVICENO || (item.RSERVICENO.indexOf(filter.RSERVICENO) > -1))
                                 && (!filter.RROWNO || (item.RROWNO.indexOf(filter.RROWNO) > -1))
                                 && (!filter.RPAYMENTNO || (item.RPAYMENTNO.indexOf(filter.RPAYMENTNO) > -1))
+                                && (!filter.RVOUCHER || (item.RVOUCHER.indexOf(filter.RVOUCHER) > -1))
                                 && (!filter.RPURPOSE || (item.RPURPOSE.indexOf(filter.RPURPOSE) > -1))
                                 && (!filter.RTYPE || (item.RTYPE.indexOf(filter.RTYPE) > -1))
                                 && (!filter.RCOSTCENTER || (item.RCOSTCENTER.indexOf(filter.RCOSTCENTER) > -1))
@@ -293,8 +295,8 @@
                                 && (!filter.RINVDATE || (item.RINVDATE.indexOf(filter.RINVDATE) > -1))
                                 && (!filter.RTOTAL || (item.RTOTAL.indexOf(filter.RTOTAL) > -1))
                                 && (!filter.RDiscount || (item.RDiscount.indexOf(filter.RDiscount) > -1))
-                                && (!filter.RVat || (item.RVat.indexOf(filter.RVat) > -1))
-                                && (!filter.RStatus || (item.RStatus.indexOf(filter.RStatus) > -1));
+                                && (!filter.RVat || (item.RVat.indexOf(filter.RVat) > -1));
+
                         console.log(data.resolve(response));
 
                     });
@@ -325,22 +327,27 @@
 //                $("#jsGrid").jsGrid("loadData");
             },
             updateItem: function (item) {
-//                alert(item.RDTOTA_KGS);
-                console.log(item);
+//                alert(item.RVOUCHER);
+                if (!item.RVOUCHER === null) {
+                    alert("This service Number has already assigned the voucher and cannot change the status");
+                    return
+                    $("#jsGrid").jsGrid("loadData");
+                }
+//                 console.log(item);
                 formData = {};
-                formData.company = item.RCOMPANY;
-                formData.customerid = item.RCUSTOMERID;
-                formData.billdate = item.RBILLDATE;
-                formData.paydate = item.RPAYDATE;
-                formData.startdate = item.RSTARTDATE;
-                formData.enddate = item.RENDDATE;
-                formData.path = "updateHeaderFinance";
+                formData.serviceno = item.RSERVICENO;
+                formData.cono = cono;
+                formData.divi = divi;
+                formData.status = item.RStatus;
+                formData.path = "rollbackservices";
                 $.ajax({
                     url: './Action',
-                    type: 'POST',
+                    type: 'GET',
                     dataType: 'json',
                     data: formData,
                     async: false
+                }).done(function (response) {
+                    alert(item.RSERVICENO + " has Been updated");
                 });
                 $("#jsGrid").jsGrid("loadData");
             },
@@ -369,10 +376,28 @@
                     // Return an empty string to remove the delete button
                     return "";
                 }},
+            {title: "status", name: "RStatus", css: "limitext", type: "text", editing: true, align: "Right", width: 100
+                ,
+                editTemplate: function (value) {
+                    // Create an input element with a datalist for insertion
+                    var reitem = this._insertAuto = $input = $("<input>").attr("type", "text").attr("list", "itemList");
+                    var $datalist = $("<datalist>").attr("id", "itemList");
+                    // Add options to the datalist
+                    $('#itemlist').empty().append('<option value="" selected="selected">Select Year!</option>');
 
+                    $datalist.append($("<option>").attr("value", "Normal"));
+                    $datalist.append($("<option>").attr("value", "Submitted"));
+                    $datalist.append($("<option>").attr("value", "Canceled"));
+                    return $("<div>").append($input).append($datalist);
+                }, editValue: function () {
+                    var revalue = this._insertAuto.val();
+                    return revalue;
+                }
+            },
             {title: "Services No.", name: "RSERVICENO", css: "limitext", type: "text", editing: false, align: "left", width: 70},
             {title: "Row No.", name: "RROWNO", css: "limitext", type: "text", editing: false, align: "left", width: 70},
             {title: "PAYMENT No.", name: "RPAYMENTNO", css: "limitext", type: "text", editing: false, align: "left", width: 70},
+            {title: "Voucher", name: "RVOUCHER", css: "limitext", type: "text", editing: false, align: "left", width: 70},
             {title: "Purpose/Sample", name: "RPURPOSE", css: "limitext", type: "text", editing: false, align: "left", width: 100},
             {title: "Type", name: "RTYPE", css: "limitext", type: "text", editing: false, align: "left", width: 50},
             {title: "Cost center", name: "RCOSTCENTER", css: "limitext", type: "text", editing: false, align: "left", width: 250},
@@ -382,8 +407,8 @@
             {title: "Invoice Date", name: "RINVDATE", css: "limitext", type: "text", editing: false, align: "right", width: 100},
             {title: "Total", name: "RTOTAL", css: "limitext", type: "text", editing: false, align: "right", width: 50},
             {title: "Discount", name: "RDiscount", css: "limitext", type: "text", editing: false, align: "right", width: 50},
-            {title: "Vat(%)", name: "RVat", css: "limitext", type: "text", editing: false, align: "right", width: 50},
-            {title: "Status", name: "RStatus", css: "limitext", type: "text", editing: false, align: "left", width: 80}
+            {title: "Vat(%)", name: "RVat", css: "limitext", type: "text", editing: false, align: "right", width: 50}
+
 
         ]
 

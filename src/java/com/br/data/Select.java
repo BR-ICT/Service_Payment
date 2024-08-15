@@ -940,7 +940,7 @@ public class Select {
                             + "JOIN  " + dbname + ".PAYMENTHEAD B ON A.GRNP_NO = B.EPPA_NO\n"
                             + "AND B.EPRA_STAT = '10'"
                             + "AND GRNP_CONO = EPPA_CONO AND GRNP_DIVI = EPPA_DIVI\n"
-                            + "AND EPRA_REF2 = 'GRN')	\n"
+                            + "AND EPRA_REF2 = 'GRN' AND GRNP_CONO = '" + cono + "' AND  GRNP_DIVI = '" + divi + "')\n"
                             + "AND VARCHAR(GRN, 255) = '" + PRNcode + "'";
                 } else {
                     query1 = "SELECT CASE WHEN count(EPRH_PHNO) > 0 THEN 'EXIST' ELSE 'NOTEXIST' END AS existance\n"
@@ -1018,7 +1018,8 @@ public class Select {
                 query1 = " SELECT CASE WHEN COUNT(TRIM(MMITNO)) > 0\n"
                         + " THEN 'EXIST' ELSE 'NOTEXIST' END AS EXISTANCE\n"
                         + "FROM " + dbM3Name + ".MITMAS \n"
-                        + "WHERE TRIM(MMITNO) =  '" + itemcode + "'";
+                        + "WHERE TRIM(MMITNO) =  '" + itemcode + "'"
+                        + "AND MMCONO = '" + cono + "'";
 
                 System.out.println("Getsupplier\n" + query1);
                 ResultSet mRes1 = stmt.executeQuery(query1);
@@ -1428,9 +1429,14 @@ public class Select {
                 Statement stmt = conn.createStatement();
                 String query = "";
                 if (mode.equals("Date")) {
-                    query = "SELECT EPRH_PHNO,ROW_NUMBER() OVER(PARTITION BY A.EPRH_PHNO) as ROWNO,A.EPRH_TYPE,A.EPRH_PHNO,B.EPPA_NO,TRIM(EAAITM)||' : '||TRIM(EATX40) AS Costcenter,EPRH_PURPOS\n"
-                            + ",EPRH_BU,EPRH_INVDT ,EPRH_APTNO,EPRH_TOTAL\n"
-                            + ",EPRH_DISC,EPRH_VTCD,EPRH_STAT,IDSUNO||' : '||IDSUNM AS Supplier,EPRH_INVSU,EPRH_REM1,EPRH_INVDT,\n"
+                    query = "SELECT F.EGVONO as  EGVONO,D.*\n"
+                            + "FROM (\n"
+                            + "SELECT EPRH_PHNO,ROW_NUMBER() OVER(PARTITION BY A.EPRH_PHNO) as ROWNO,A.EPRH_TYPE\n"
+                            + "--,A.EPRH_PHNO\n"
+                            + ",B.EPPA_NO,TRIM(EAAITM)||' : '||TRIM(EATX40) AS Costcenter,EPRH_PURPOS\n"
+                            + ",EPRH_BU,A.EPRH_INVDT ,EPRH_APTNO,EPRH_TOTAL\n"
+                            + ",EPRH_DISC,EPRH_VTCD,EPRH_STAT,IDSUNO||' : '||IDSUNM AS Supplier,EPRH_INVSU,EPRH_REM1,\n"
+                            + "--EPRH_INVDT,\n"
                             + "CASE WHEN EPRH_STAT = 20 THEN 'Normal' \n"
                             + "WHEN EPRH_STAT = 50 THEN 'Submitted' \n"
                             + "WHEN EPRH_STAT = 99 THEN 'Canceled' \n"
@@ -1442,14 +1448,47 @@ public class Select {
                             + "AND EAAITP =  2\n"
                             + "LEFT JOIN " + dbM3Name + ".CIDMAS \n"
                             + "ON IDCONO = EPRH_CONO AND EPRH_SUNO = IDSUNO\n"
-                            + "LEFT JOIN " + dbname + ".PAYMENTLINE B\n"
+                            + "LEFT JOIN  " + dbname + ".PAYMENTLINE B\n"
                             + "ON B.EPRA_PHNO = A.EPRH_PHNO\n"
                             + "AND A.EPRH_CONO = B.EPPA_CONO\n"
                             + "AND A.EPRH_DIVI = B.EPPA_DIVI\n"
-                            + "WHERE EPRH_INVDT BETWEEN " + newStartDate + " AND " + newEndDate + "\n"
+                            + "WHERE EPRH_INVDT BETWEEN  " + newStartDate + " AND " + newEndDate + "\n"
                             + "AND UPPER(EPRH_OWAPP) LIKE '" + user + "'\n"
                             + "AND EPRH_CONO = " + cono + " AND EPRH_DIVI = " + divi + "\n";
+                    if (!Status.equals("")) {
+                        query += " AND EPRH_STAT = '" + Status + "'";
+                    }
+                    query = query + ") D LEFT JOIN (\n"
+                            + " SELECT EGVONO,EGCONO,EGDIVI,EGYEA4,EGAIT4\n"
+                            + " FROM  M3FDBPRD.FGLEDG\n"
+                            + " WHERE EGTRCD = 40\n"
+                            + " AND EGCONO = " + cono + "\n"
+                            + " AND EGDIVI = " + divi + "\n"
+                            + ") F ON F.EGYEA4 = SUBSTRING(D.EPRH_INVDT,1,4) AND F.EGAIT4 = CHAR(D.EPRH_PHNO) AND F.EGAIT4 =  CHAR(D.EPRH_PHNO)\n"
+                            + "ORDER BY D.EPRH_INVDT ASC,EPRH_PHNO";
 
+                    // CHANGE QUERY TO NEW ONE
+//                    query = "SELECT EPRH_PHNO,ROW_NUMBER() OVER(PARTITION BY A.EPRH_PHNO) as ROWNO,A.EPRH_TYPE,A.EPRH_PHNO,B.EPPA_NO,TRIM(EAAITM)||' : '||TRIM(EATX40) AS Costcenter,EPRH_PURPOS\n"
+//                            + ",EPRH_BU,EPRH_INVDT ,EPRH_APTNO,EPRH_TOTAL\n"
+//                            + ",EPRH_DISC,EPRH_VTCD,EPRH_STAT,IDSUNO||' : '||IDSUNM AS Supplier,EPRH_INVSU,EPRH_REM1,EPRH_INVDT,\n"
+//                            + "CASE WHEN EPRH_STAT = 20 THEN 'Normal' \n"
+//                            + "WHEN EPRH_STAT = 50 THEN 'Submitted' \n"
+//                            + "WHEN EPRH_STAT = 99 THEN 'Canceled' \n"
+//                            + "END AS STATUS\n"
+//                            + "FROM " + dbname + ".SERVICEHEAD A\n"
+//                            + "LEFT JOIN " + dbM3Name + ".FCHACC ON EADIVI = EPRH_DIVI\n"
+//                            + "AND A.EPRH_CONO = EACONO \n"
+//                            + "AND EAAITM = EPRH_COCE\n"
+//                            + "AND EAAITP =  2\n"
+//                            + "LEFT JOIN " + dbM3Name + ".CIDMAS \n"
+//                            + "ON IDCONO = EPRH_CONO AND EPRH_SUNO = IDSUNO\n"
+//                            + "LEFT JOIN " + dbname + ".PAYMENTLINE B\n"
+//                            + "ON B.EPRA_PHNO = A.EPRH_PHNO\n"
+//                            + "AND A.EPRH_CONO = B.EPPA_CONO\n"
+//                            + "AND A.EPRH_DIVI = B.EPPA_DIVI\n"
+//                            + "WHERE EPRH_INVDT BETWEEN " + newStartDate + " AND " + newEndDate + "\n"
+//                            + "AND UPPER(EPRH_OWAPP) LIKE '" + user + "'\n"
+//                            + "AND EPRH_CONO = " + cono + " AND EPRH_DIVI = " + divi + "\n";
 //                    query = "SELECT EPRH_TYPE,EPRH_PHNO,TRIM(EAAITM)||' : '||TRIM(EATX40) AS Costcenter,EPRH_PURPOS\n"
 //                            + ",EPRH_BU,EPRH_INVDT ,EPRH_APTNO,EPRH_TOTAL\n"
 //                            + ",EPRH_DISC,EPRH_VTCD,EPRH_STAT,IDSUNO||' : '||IDSUNM AS Supplier,EPRH_INVSU,EPRH_REM1,EPRH_INVDT,\n"
@@ -1467,13 +1506,15 @@ public class Select {
 //                            + "WHERE EPRH_INVDT BETWEEN " + newStartDate + " AND " + newEndDate + "\n"
 //                            + "AND UPPER(EPRH_OWAPP) LIKE '" + user + "'\n"
 //                            + "AND EPRH_CONO =" + cono + " AND EPRH_DIVI = " + divi + "\n";
-                    if (!Status.equals("")) {
-                        query += " AND EPRH_STAT = '" + Status + "'";
-                    }
                 } else if (mode.equals("Num")) {
-                    query = "SELECT EPRH_PHNO,ROW_NUMBER() OVER(PARTITION BY A.EPRH_PHNO) as ROWNO,A.EPRH_TYPE,A.EPRH_PHNO,B.EPPA_NO,TRIM(EAAITM)||' : '||TRIM(EATX40) AS Costcenter,EPRH_PURPOS\n"
-                            + ",EPRH_BU,EPRH_INVDT ,EPRH_APTNO,EPRH_TOTAL\n"
-                            + ",EPRH_DISC,EPRH_VTCD,EPRH_STAT,IDSUNO||' : '||IDSUNM AS Supplier,EPRH_INVSU,EPRH_REM1,EPRH_INVDT,\n"
+                    query = "SELECT F.EGVONO as  EGVONO,D.*\n"
+                            + "FROM (\n"
+                            + "SELECT EPRH_PHNO,ROW_NUMBER() OVER(PARTITION BY A.EPRH_PHNO) as ROWNO,A.EPRH_TYPE\n"
+                            + "--,A.EPRH_PHNO\n"
+                            + ",B.EPPA_NO,TRIM(EAAITM)||' : '||TRIM(EATX40) AS Costcenter,EPRH_PURPOS\n"
+                            + ",EPRH_BU,A.EPRH_INVDT ,EPRH_APTNO,EPRH_TOTAL\n"
+                            + ",EPRH_DISC,EPRH_VTCD,EPRH_STAT,IDSUNO||' : '||IDSUNM AS Supplier,EPRH_INVSU,EPRH_REM1,\n"
+                            + "--EPRH_INVDT,\n"
                             + "CASE WHEN EPRH_STAT = 20 THEN 'Normal' \n"
                             + "WHEN EPRH_STAT = 50 THEN 'Submitted' \n"
                             + "WHEN EPRH_STAT = 99 THEN 'Canceled' \n"
@@ -1485,16 +1526,45 @@ public class Select {
                             + "AND EAAITP =  2\n"
                             + "LEFT JOIN " + dbM3Name + ".CIDMAS \n"
                             + "ON IDCONO = EPRH_CONO AND EPRH_SUNO = IDSUNO\n"
-                            + "LEFT JOIN " + dbname + ".PAYMENTLINE B\n"
+                            + "LEFT JOIN  " + dbname + ".PAYMENTLINE B\n"
                             + "ON B.EPRA_PHNO = A.EPRH_PHNO\n"
                             + "AND A.EPRH_CONO = B.EPPA_CONO\n"
                             + "AND A.EPRH_DIVI = B.EPPA_DIVI\n"
-                            + "WHERE EPRH_PHNO = '" + serviceno.trim() + "'\n"
+                            + "WHERE EPRH_PHNO = '" + serviceno + "'\n"
                             + "AND UPPER(EPRH_OWAPP) LIKE '" + user + "'\n"
-                            + "AND EPRH_CONO =" + cono + " AND EPRH_DIVI = " + divi + "\n";
+                            + "AND EPRH_CONO =" + cono + " AND EPRH_DIVI =" + divi + "\n"
+                            + ") D LEFT JOIN (\n"
+                            + " SELECT EGVONO,EGCONO,EGDIVI,EGYEA4,EGAIT4\n"
+                            + " FROM  M3FDBPRD.FGLEDG\n"
+                            + " WHERE EGTRCD = 40\n"
+                            + " AND EGCONO =" + cono + "\n"
+                            + " AND EGDIVI =" + divi + " \n"
+                            + ") F ON F.EGYEA4 = SUBSTRING(D.EPRH_INVDT,1,4) AND F.EGAIT4 = CHAR(D.EPRH_PHNO) AND F.EGAIT4 =  CHAR(D.EPRH_PHNO)\n"
+                            + "ORDER BY D.EPRH_INVDT ASC,EPRH_PHNO \n";
+//                    query = "SELECT EPRH_PHNO,ROW_NUMBER() OVER(PARTITION BY A.EPRH_PHNO) as ROWNO,A.EPRH_TYPE,A.EPRH_PHNO,B.EPPA_NO,TRIM(EAAITM)||' : '||TRIM(EATX40) AS Costcenter,EPRH_PURPOS\n"
+//                            + ",EPRH_BU,EPRH_INVDT ,EPRH_APTNO,EPRH_TOTAL\n"
+//                            + ",EPRH_DISC,EPRH_VTCD,EPRH_STAT,IDSUNO||' : '||IDSUNM AS Supplier,EPRH_INVSU,EPRH_REM1,EPRH_INVDT,\n"
+//                            + "CASE WHEN EPRH_STAT = 20 THEN 'Normal' \n"
+//                            + "WHEN EPRH_STAT = 50 THEN 'Submitted' \n"
+//                            + "WHEN EPRH_STAT = 99 THEN 'Canceled' \n"
+//                            + "END AS STATUS\n"
+//                            + "FROM " + dbname + ".SERVICEHEAD A\n"
+//                            + "LEFT JOIN " + dbM3Name + ".FCHACC ON EADIVI = EPRH_DIVI\n"
+//                            + "AND A.EPRH_CONO = EACONO \n"
+//                            + "AND EAAITM = EPRH_COCE\n"
+//                            + "AND EAAITP =  2\n"
+//                            + "LEFT JOIN " + dbM3Name + ".CIDMAS \n"
+//                            + "ON IDCONO = EPRH_CONO AND EPRH_SUNO = IDSUNO\n"
+//                            + "LEFT JOIN " + dbname + ".PAYMENTLINE B\n"
+//                            + "ON B.EPRA_PHNO = A.EPRH_PHNO\n"
+//                            + "AND A.EPRH_CONO = B.EPPA_CONO\n"
+//                            + "AND A.EPRH_DIVI = B.EPPA_DIVI\n"
+//                            + "WHERE EPRH_PHNO = '" + serviceno.trim() + "'\n"
+//                            + "AND UPPER(EPRH_OWAPP) LIKE '" + user + "'\n"
+//                            + "AND EPRH_CONO =" + cono + " AND EPRH_DIVI = " + divi + "\n";
                 }
 
-                query += "ORDER BY SUBSTRING(EPRH_PHNO,4,5)";
+//                query += "ORDER BY SUBSTRING(EPRH_PHNO,4,5)";
                 System.out.println(query);
                 ResultSet mRes = stmt.executeQuery(query);
                 while (mRes.next()) {
@@ -1552,6 +1622,10 @@ public class Select {
                     if (Value12 != null) {
                         Value12 = Value12.trim();
                     }
+                    String Voucher = mRes.getString("EGVONO");
+                    if (Voucher != null) {
+                        Voucher = Voucher.trim();
+                    }
                     //GET COST CENTER
 
                     Map<String, Object> mMap = new HashMap<>();
@@ -1570,6 +1644,7 @@ public class Select {
                     mMap.put("RDiscount", value10);
                     mMap.put("RVat", value11);
                     mMap.put("RStatus", Value12);
+                    mMap.put("RVOUCHER", Voucher);
                     mJSonArr.put(mMap);
 
                 }
@@ -1611,8 +1686,11 @@ public class Select {
                 //-------------- GET HISTORY FOR THE ----------------------------
                 Statement stmt = conn.createStatement();
                 if (mode.equals("Date")) {
-                    query = "SELECT A.EPPA_NO,ROW_NUMBER() OVER(PARTITION BY A.EPPA_NO) AS ROWNUMBER,COALESCE(B.EPRA_PHNO,C.GRNP_GRN) AS SERVICES,A.EPRA_REF2,A.EPRA_PARM,TRIM(EAAITM)||' : '||TRIM(EATX40) AS Costcenter\n"
-                            + ",IDSUNO||' : '||IDSUNM AS Supplier,A.EPPA_DUEDT,\n"
+                    query = "SELECT F.EGVONO as  EGVONO,D.*,CHAR(D.SERVICES)\n"
+                            + "--,CHAR(D.SRN_NO)\n"
+                            + "FROM (\n"
+                            + "SELECT A.EPPA_NO,ROW_NUMBER() OVER(PARTITION BY A.EPPA_NO) AS ROWNUMBER,COALESCE(B.EPRA_PHNO,C.GRNP_GRN) AS SERVICES,A.EPRA_REF2,A.EPRA_PARM,TRIM(EAAITM)||' : '||TRIM(EATX40) AS Costcenter\n"
+                            + ",IDSUNO||' : '||IDSUNM AS Supplier,A.EPPA_DUEDT,EPPA_DATE,\n"
                             + "CASE WHEN A.EPPA_PAMT = 1 THEN 'Cash'\n"
                             + "WHEN A.EPPA_PAMT = 2 THEN 'Cheque No.'\n"
                             + "WHEN A.EPPA_PAMT = 3 THEN 'Bank Transfer'\n"
@@ -1641,8 +1719,52 @@ public class Select {
                             + "WHERE A.EPPA_DUEDT BETWEEN " + newStartDate + "\n"
                             + "AND " + newEndDate + "\n"
                             + "AND UPPER(A.EPRA_REQBY) LIKE '" + user + "'\n"
-                            + "AND A.EPPA_CONO =" + cono + " AND A.EPPA_DIVI =" + divi;
+                            + "AND A.EPPA_CONO = " + cono + " AND A.EPPA_DIVI =" + divi + "\n";
+                    if (!Status.equals("")) {
+                        query += "AND A.EPRA_STAT = '" + Status + "'";
+                    }
+                    query = query + ") D LEFT JOIN (\n"
+                            + " SELECT EGVONO,EGCONO,EGDIVI,EGYEA4,EGAIT4\n"
+                            + " FROM  M3FDBPRD.FGLEDG\n"
+                            + " WHERE EGTRCD = 40\n"
+                            + " AND EGCONO =" + cono + "\n"
+                            + " AND EGDIVI =" + divi + "\n"
+                            + ") F ON F.EGYEA4 = SUBSTRING(D.EPPA_DATE,1,4) AND F.EGAIT4 = CHAR(D.SERVICES) \n"
+                            + "--AND F.EGAIT4 =  CHAR(D.SRN_NO)\n"
+                            + "ORDER BY EPPA_DATE ASC,EPPA_NO";
 
+                    // OLD MONITORING TO FIX THE ROLLBACK
+//                    query = "SELECT A.EPPA_NO,ROW_NUMBER() OVER(PARTITION BY A.EPPA_NO) AS ROWNUMBER,COALESCE(B.EPRA_PHNO,C.GRNP_GRN) AS SERVICES,A.EPRA_REF2,A.EPRA_PARM,TRIM(EAAITM)||' : '||TRIM(EATX40) AS Costcenter\n"
+//                            + ",IDSUNO||' : '||IDSUNM AS Supplier,A.EPPA_DUEDT,\n"
+//                            + "CASE WHEN A.EPPA_PAMT = 1 THEN 'Cash'\n"
+//                            + "WHEN A.EPPA_PAMT = 2 THEN 'Cheque No.'\n"
+//                            + "WHEN A.EPPA_PAMT = 3 THEN 'Bank Transfer'\n"
+//                            + "END AS PAYMENTMETHOD\n"
+//                            + ",A.EPRA_ADVREF,A.EPRA_ADVAMT,\n"
+//                            + "CASE WHEN A.EPRA_STAT = '00' THEN 'NORMAL'\n"
+//                            + "WHEN A.EPRA_STAT = '10' THEN 'SUBMITTED'\n"
+//                            + "WHEN A.EPRA_STAT = '99' THEN 'CANCALED' END AS STATUS\n"
+//                            + "FROM  " + dbname + ".PAYMENTHEAD A\n"
+//                            + "LEFT JOIN " + dbM3Name + ".FCHACC ON EADIVI = A.EPPA_DIVI\n"
+//                            + "AND EACONO =  A.EPPA_CONO\n"
+//                            + "AND EAAITM = A.EPPA_COCE\n"
+//                            + "AND EAAITP =  2\n"
+//                            + "LEFT JOIN " + dbM3Name + ".CIDMAS \n"
+//                            + "ON IDCONO = A.EPPA_CONO \n"
+//                            + "AND A.EPRA_SUNO = IDSUNO\n"
+//                            + "LEFT JOIN " + dbname + ".PAYMENTLINE B\n"
+//                            + "ON B.EPPA_NO = A.EPPA_NO\n"
+//                            + "AND A.EPPA_CONO = B.EPPA_CONO\n"
+//                            + "AND A.EPPA_DIVI = B.EPPA_DIVI \n"
+//                            + "LEFT JOIN \n"
+//                            + "" + dbname + ".PAYMENTLINEGRN C\n"
+//                            + "ON A.EPPA_CONO = C.GRNP_CONO\n"
+//                            + "AND A.EPPA_DIVI = C.GRNP_DIVI\n"
+//                            + "AND C.GRNP_NO = A.EPPA_NO\n"
+//                            + "WHERE A.EPPA_DUEDT BETWEEN " + newStartDate + "\n"
+//                            + "AND " + newEndDate + "\n"
+//                            + "AND UPPER(A.EPRA_REQBY) LIKE '" + user + "'\n"
+//                            + "AND A.EPPA_CONO =" + cono + " AND A.EPPA_DIVI =" + divi;
 //                    query = "SELECT EPPA_NO,EPRA_REF2,EPRA_PARM,TRIM(EAAITM)||' : '||TRIM(EATX40) AS Costcenter\n"
 //                            + ",IDSUNO||' : '||IDSUNM AS Supplier,EPPA_DUEDT,\n"
 //                            + "CASE WHEN EPPA_PAMT = 1 THEN 'Cash'\n"
@@ -1665,13 +1787,13 @@ public class Select {
 //                            + "AND " + newEndDate + "\n"
 //                            + "AND UPPER(EPRA_REQBY) LIKE '" + user + "'\n"
 //                            + "AND EPPA_CONO = " + cono + " AND EPPA_DIVI =" + divi;
-                    if (!Status.equals("")) {
-                        query += "\n AND EPRA_STAT = '" + Status + "'";
-                    }
                 } else if (mode.equals("Num")) {
 
-                    query = "SELECT A.EPPA_NO,ROW_NUMBER() OVER(PARTITION BY A.EPPA_NO) AS ROWNUMBER,COALESCE(B.EPRA_PHNO,C.GRNP_GRN) AS SERVICES,A.EPRA_REF2,A.EPRA_PARM,TRIM(EAAITM)||' : '||TRIM(EATX40) AS Costcenter\n"
-                            + ",IDSUNO||' : '||IDSUNM AS Supplier,A.EPPA_DUEDT,\n"
+                    query = "SELECT F.EGVONO as  EGVONO,D.*,CHAR(D.SERVICES)\n"
+                            + "--,CHAR(D.SRN_NO)\n"
+                            + "FROM (\n"
+                            + "SELECT A.EPPA_NO,ROW_NUMBER() OVER(PARTITION BY A.EPPA_NO) AS ROWNUMBER,COALESCE(B.EPRA_PHNO,C.GRNP_GRN) AS SERVICES,A.EPRA_REF2,A.EPRA_PARM,TRIM(EAAITM)||' : '||TRIM(EATX40) AS Costcenter\n"
+                            + ",IDSUNO||' : '||IDSUNM AS Supplier,A.EPPA_DUEDT,EPPA_DATE,\n"
                             + "CASE WHEN A.EPPA_PAMT = 1 THEN 'Cash'\n"
                             + "WHEN A.EPPA_PAMT = 2 THEN 'Cheque No.'\n"
                             + "WHEN A.EPPA_PAMT = 3 THEN 'Bank Transfer'\n"
@@ -1699,10 +1821,19 @@ public class Select {
                             + "AND C.GRNP_NO = A.EPPA_NO\n"
                             + "WHERE A.EPPA_NO =" + prvno.trim() + "\n"
                             + "AND UPPER(A.EPRA_REQBY) LIKE '" + user + "'\n"
-                            + "AND A.EPPA_CONO = " + cono + " AND A.EPPA_DIVI =" + divi;
+                            + "AND A.EPPA_CONO = " + cono + " AND A.EPPA_DIVI =" + divi + "\n"
+                            + ") D LEFT JOIN (\n"
+                            + " SELECT EGVONO,EGCONO,EGDIVI,EGYEA4,EGAIT4\n"
+                            + " FROM  M3FDBPRD.FGLEDG\n"
+                            + " WHERE EGTRCD = 40\n"
+                            + " AND EGCONO =" + cono + "\n"
+                            + " AND EGDIVI =" + divi + "\n"
+                            + ") F ON F.EGYEA4 = SUBSTRING(D.EPPA_DATE,1,4) AND F.EGAIT4 = CHAR(D.SERVICES) \n"
+                            + "--AND F.EGAIT4 =  CHAR(D.SRN_NO)\n"
+                            + "ORDER BY EPPA_DATE ASC,EPPA_NO";
                 }
 
-                query += "\n ORDER BY SUBSTRING(EPPA_NO,4,5)";
+//                query += "\n ORDER BY SUBSTRING(EPPA_NO,4,5)";
                 System.out.println(query);
                 ResultSet mRes = stmt.executeQuery(query);
                 while (mRes.next()) {
@@ -1752,6 +1883,10 @@ public class Select {
                     if (value10 != null) {
                         value10 = value10.trim();
                     }
+                    String voucher = mRes.getString("EGVONO");
+                    if (voucher != null) {
+                        voucher = voucher.trim();
+                    }
                     //GET COST CENTER
 
                     Map<String, Object> mMap = new HashMap<>();
@@ -1767,6 +1902,7 @@ public class Select {
                     mMap.put("RDESC", value8);
                     mMap.put("RAMOUNT", value9);
                     mMap.put("RStatus", value10);
+                    mMap.put("RVOUCHER", voucher);
 //                    mMap.put("RVat", value11);
 //                    mMap.put("RStatus", Value12);
                     mJSonArr.put(mMap);

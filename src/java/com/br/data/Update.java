@@ -290,4 +290,108 @@ public class Update {
 
     }
 
+    public static JSONArray rollbackserviceshistory(String servicesno, String cono, String divi, String status, String voucher) throws Exception {
+
+        JSONArray mJSonArr = new JSONArray();
+        Connection conn = ConnectDB2.ConnectionDB();
+        Statement stmt1 = conn.createStatement();
+        String statusno = "20";
+        if (status.equals("Normal")) {
+            statusno = "20";
+        } else if (status.equals("Submitted")) {
+            statusno = "50";
+        } else if (status.equals("Canceled")) {
+            statusno = "99";
+        }
+        try {
+            if (conn != null) {
+//                RHCONO, RHDIVI, RHWARE, RHPERI
+                Statement stmt = conn.createStatement();
+                String StrGetMaxLine = "UPDATE  " + dbname + ".SERVICEHEAD\n"
+                        + "SET EPRH_STAT = '" + statusno + "'\n"
+                        + "WHERE EPRH_PHNO = '" + servicesno + "'\n"
+                        + "AND EPRH_CONO = '" + cono + "'\n"
+                        + "AND EPRH_DIVI = '" + divi + "'";
+                stmt1.execute(StrGetMaxLine);
+
+            } else {
+                System.out.println("Server can't connect.");
+            }
+
+        } catch (SQLException sqle) {
+            throw sqle;
+        } catch (Exception e) {
+            e.printStackTrace();
+            Map<String, Object> mMap = new HashMap<>();
+            mMap.put("result", "nok");
+            mMap.put("message", e);
+            mJSonArr.put(mMap);
+            if (conn != null) {
+                conn.close();
+            }
+            throw e;
+        } finally {
+            if (conn != null) {
+                conn.close();
+            }
+
+        }
+
+        return mJSonArr;
+
+    }
+
+    public static JSONArray rollbackpaymenthistory(String paymentno, String cono, String divi, String status, String voucher) throws Exception {
+
+        JSONArray mJSonArr = new JSONArray();
+        Connection conn = ConnectDB2.ConnectionDB();
+        Statement stmt1 = conn.createStatement();
+        String statusno = "00";
+        if (status.equals("Normal")) {
+            statusno = "00";
+        } else if (status.equals("Submitted")) {
+            statusno = "10";
+        } else if (status.equals("Canceled")) {
+            statusno = "99";
+        }
+        try {
+            if (conn != null) {
+//                if (voucher.equals("")) {
+                Statement stmt = conn.createStatement();
+                String StrGetMaxLine = "UPDATE  " + dbname + ".PAYMENTHEAD\n"
+                        + "SET EPRA_STAT = '" + statusno + "'\n"
+                        + "WHERE EPPA_NO = '" + paymentno + "'\n"
+                        + "AND EPPA_CONO = '" + cono + "'\n"
+                        + "AND EPPA_DIVI = '" + divi + "'";
+                stmt1.execute(StrGetMaxLine);
+//                }
+//                RHCONO, RHDIVI, RHWARE, RHPERI
+
+            } else {
+                System.out.println("Server can't connect.");
+            }
+
+        } catch (SQLException sqle) {
+            throw sqle;
+        } catch (Exception e) {
+            e.printStackTrace();
+            Map<String, Object> mMap = new HashMap<>();
+            mMap.put("result", "nok");
+            mMap.put("message", e);
+            mJSonArr.put(mMap);
+            if (conn != null) {
+                conn.close();
+            }
+            throw e;
+        } finally {
+            if (conn != null) {
+                conn.close();
+            }
+
+        }
+
+        return mJSonArr;
+
+    }
+
 }

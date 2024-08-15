@@ -320,7 +320,18 @@ public class Action extends HttpServlet {
                         request.getParameter("status")));
                 out.flush();
                 break;
-
+            case "rollbackserviceshistory":
+                out.print(Update.rollbackserviceshistory(request.getParameter("serviceno"),
+                        request.getParameter("cono"), request.getParameter("divi"),
+                        request.getParameter("status"),request.getParameter("voucher")));
+                out.flush();
+                break;
+            case "rollbackpaymenthistory":
+                out.print(Update.rollbackpaymenthistory(request.getParameter("paymentno"),
+                        request.getParameter("cono"), request.getParameter("divi"),
+                        request.getParameter("status"),request.getParameter("voucher")));
+                out.flush();
+                break;
             case "changeSRNstatus":
                 out.print(Update.changeSRNstatus(request.getParameter("cono"),
                         request.getParameter("divi"),
