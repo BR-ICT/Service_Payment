@@ -768,7 +768,7 @@ public class Select {
                             + "    SUBSTR(CHAR(ICTRDT), 1, 4) || '-' ||\n"
                             + "    SUBSTR(CHAR(ICTRDT), 5, 2) || '-' ||\n"
                             + "    SUBSTR(CHAR(ICTRDT), 7, 2)\n"
-                            + ")) < 31\n"
+                            + ")) < 45\n"
                             + "--AND SUBSTRING(GRN,0,3) IN ('20','48','45','42','44','43','99','98')\n"
                             //                            + "and a.grn not in (select grnp_grn  FROM BRLDTA0100.EPR_GRNPAY)\n"
                             + sqlgrn + "\n"
@@ -801,7 +801,13 @@ public class Select {
                             + "AND C.EPPA_DIVI  ='" + divi + "'\n"
                             + "AND C.EPRA_STAT != 99)\n"
                             + "AND a.EPRH_TYPE = '" + app + "' \n"
-                            + "AND UPPER(EPRH_REQBY)  = '" + user + "'";
+                            + "AND UPPER(EPRH_REQBY)  = '" + user + "'\n"
+                            + "AND SUBSTRING(EPRH_PHNO,1,10) NOT IN (\n"
+                            + "SELECT SETT_INVC  \n"
+                            + "FROM\n"
+                            + dbname + ".FIN_SETTADALL D\n"
+                            + "WHERE A.EPRH_CONO  = D.SETT_CONO\n"
+                            + "AND A.EPRH_DIVI = D.SETT_DIVI)";
                 }
 
                 System.out.println("Getsupplier\n" + query1);

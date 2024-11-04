@@ -68,7 +68,7 @@ public class Report extends HttpServlet {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
         HttpSession session = request.getSession(true);
-        String cono2 = session.getAttribute("cono").toString();;
+        String cono2 = session.getAttribute("cono").toString();
         String divi2 = session.getAttribute("divi").toString();
         String comp2 = session.getAttribute("comp").toString();
         String testornot = "";
