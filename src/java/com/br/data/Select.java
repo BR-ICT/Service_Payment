@@ -887,14 +887,26 @@ public class Select {
 
     }
 
-    public static JSONArray checkPRN(String cono, String divi, String PRNcode, String app, String costcenter) throws Exception {
+    public static JSONArray checkPRN(String cono, String divi, String PRNcode, String app, String costcenter, String supplier) throws Exception {
         boolean check = true;
         String itemcode = null;
         String existornot = "notexist";
+        String grndupnum = "";
         String query1 = null;
+        String query2 = null;
+        String query3 = null;
+        String query4 = null;
+        String result = null;
+        String resultInvoice = "";
+        String duplicated = null;
         if (PRNcode.contains(":")) {
             String[] itemalldats = PRNcode.split(":");
             PRNcode = itemalldats[0];
+
+        }
+        if (supplier.contains(":")) {
+            String[] itemalldat2 = supplier.split(":");
+            supplier = itemalldat2[0];
 
         }
 //        else {
@@ -967,19 +979,54 @@ public class Select {
                             + "AND C.EPRA_STAT != 99)\n"
                             + "AND VARCHAR(EPRH_PHNO) ='" + PRNcode + "'";
                 }
+                //CHECK FOR DUPLICATED INVOICE  
+                if (app.equals("GRN")) {
+                    query2 = "SELECT SUBSTR(H.ICSUDO,1,15) AS GRNP_INVC\n"
+                            + "FROM BRLDTA0100.SUM_GRN01 AS H \n"
+                            + " WHERE H.GRN = '" + PRNcode + "'\n"
+                            + " AND IACONO = '" + cono + "'";
+                    ResultSet mRes2 = stmt.executeQuery(query2);
+                    while (mRes2.next()) {
+                        resultInvoice = mRes2.getString(1).trim();
+                    }
+                    query3 = " SELECT CASE WHEN COUNT(GRNP_INVC) > 0\n"
+                            + " THEN 'EXIST' ELSE 'NOTEXIST' END AS EXISTANCE\n"
+                            + " FROM BRLDTA0100.PAYMENTLINEGRN p \n"
+                            + " LEFT JOIN BRLDTA0100.PAYMENTHEAD\n"
+                            + " ON EPPA_CONO = GRNP_CONO\n"
+                            + " AND GRNP_DIVI = EPPA_DIVI\n"
+                            + "  AND GRNP_NO = EPPA_NO\n"
+                            + " WHERE TRIM(GRNP_INVC)  = '" + resultInvoice + "'\n"
+                            + " AND GRNP_CONO = '" + cono + "' AND GRNP_DIVI ='" + divi + "'\n"
+                            + " AND EPRA_SUNO = '" + supplier + "'";
+                    ResultSet mRes3 = stmt.executeQuery(query3);
+                    while (mRes3.next()) {
+                        duplicated = mRes3.getString(1).trim();
+                    }
+                }
                 System.out.println("Getsupplier\n" + query1);
                 ResultSet mRes1 = stmt.executeQuery(query1);
                 while (mRes1.next()) {
-                    String result = mRes1.getString(1).trim();
-
-                    if (result.equals("EXIST")) {
-                        existornot = "exist";
-                    } else if (result.equals("NOTEXIST")) {
-                        existornot = "notexist";
+                    result = mRes1.getString(1).trim();
+                }
+                if (duplicated.equals("EXIST")) {
+                    existornot = "duplicated";
+                    query4 = " SELECT GRNP_GRN FROM BRLDTA0100.PAYMENTLINEGRN p \n"
+                            + " WHERE TRIM(GRNP_INVC)  = '" + resultInvoice + "'\n"
+                            + " AND GRNP_CONO = '" + cono + "' AND GRNP_DIVI  = '" + divi + "'";
+                    ResultSet mRes4 = stmt.executeQuery(query4);
+                    while (mRes4.next()) {
+                        grndupnum = mRes4.getString(1).trim();
                     }
+                } else if (result.equals("EXIST")) {
+                    existornot = "exist";
+                } else if (result.equals("NOTEXIST")) {
+                    existornot = "notexist";
                 }
                 Map<String, Object> mMap = new HashMap<>();
                 mMap.put("result", existornot);
+                mMap.put("dupgrn", grndupnum);
+                mMap.put("invoice", resultInvoice);
                 mJSonArr.put(mMap);
 
             } else {

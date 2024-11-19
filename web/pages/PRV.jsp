@@ -452,7 +452,9 @@
                 },
 // INSERT ITEM FUNCTION
                 insertItem: function (item) {
-
+                    console.log("testing supplier costcenter");
+                    console.log($("#supplier").val());
+                    console.log($("#costcenter").val());
                     formData = {};
                     formData.company = item.RCOMPANY;
                     $.ajax({
@@ -465,7 +467,8 @@
                             divi: divi,
                             PRNcode: item.Rernno,
                             app: app,
-                            costcenter: $("costcenter").val()
+                            costcenter: $("#costcenter").val(),
+                            supplier: $("#supplier").val()
                         },
                         async: false
                     }).done(function (response) {
@@ -473,6 +476,10 @@
                             var result = obj.result;
                             if (result === 'notexist') {
                                 alert("Data " + app + " not Found");
+                                $("#jsGrid").jsGrid("loadData");
+                                return;
+                            } else if (result === 'duplicated') {
+                                alert("Invoice " + obj.invoice + " duplicated Found, the duplicated number of this Invoice is " + obj.dupgrn);
                                 $("#jsGrid").jsGrid("loadData");
                                 return;
                             } else {
@@ -771,6 +778,7 @@
 
 
     $("#vsave").click(function checkforsave() {
+
         lastestgrninbox = $("#GRNnofordata").val();
         var duedate = $("#vDuedate").val();
         var costcenter = $("#costcenter").val();
@@ -810,7 +818,7 @@
             type: 'GET',
             dataType: 'json',
             data: {
-                    path: "checkSupplier",
+                path: "checkSupplier",
                 divi: divi,
                 cono: cono,
                 supplier: $("#supplier").val()
@@ -955,7 +963,8 @@
                             divi: divi,
                             PRNcode: lastestgrninbox,
                             app: app,
-                            costcenter: $("costcenter").val()
+                            costcenter: $("#costcenter").val(),
+                            supplier: $("#supplier").val()
                         },
                         async: false
                     }).done(function (response) {

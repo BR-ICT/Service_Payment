@@ -58,7 +58,12 @@ public class Action extends HttpServlet {
                 out.flush();
                 break;
             case "checkPRN":
-                out.print(Select.checkPRN(request.getParameter("cono"), request.getParameter("divi"), request.getParameter("PRNcode"), request.getParameter("app"), request.getParameter("costcenter")));
+                out.print(Select.checkPRN(request.getParameter("cono"),
+                         request.getParameter("divi"),
+                         request.getParameter("PRNcode"),
+                         request.getParameter("app"),
+                         request.getParameter("costcenter"),
+                         request.getParameter("supplier")));
                 out.flush();
                 break;
             case "checkITEM":
@@ -323,13 +328,13 @@ public class Action extends HttpServlet {
             case "rollbackserviceshistory":
                 out.print(Update.rollbackserviceshistory(request.getParameter("serviceno"),
                         request.getParameter("cono"), request.getParameter("divi"),
-                        request.getParameter("status"),request.getParameter("voucher")));
+                        request.getParameter("status"), request.getParameter("voucher")));
                 out.flush();
                 break;
             case "rollbackpaymenthistory":
                 out.print(Update.rollbackpaymenthistory(request.getParameter("paymentno"),
                         request.getParameter("cono"), request.getParameter("divi"),
-                        request.getParameter("status"),request.getParameter("voucher")));
+                        request.getParameter("status"), request.getParameter("voucher")));
                 out.flush();
                 break;
             case "changeSRNstatus":
