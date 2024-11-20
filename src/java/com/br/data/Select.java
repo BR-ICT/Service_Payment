@@ -898,7 +898,7 @@ public class Select {
         String query4 = null;
         String result = null;
         String resultInvoice = "";
-        String duplicated = null;
+        String duplicated = "";
         if (PRNcode.contains(":")) {
             String[] itemalldats = PRNcode.split(":");
             PRNcode = itemalldats[0];
