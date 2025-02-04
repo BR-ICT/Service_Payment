@@ -982,7 +982,7 @@ public class Select {
                 //CHECK FOR DUPLICATED INVOICE  
                 if (app.equals("GRN")) {
                     query2 = "SELECT SUBSTR(H.ICSUDO,1,15) AS GRNP_INVC\n"
-                            + "FROM BRLDTA0100.SUM_GRN01 AS H \n"
+                            + "FROM " + dbname + ".SUM_GRN01 AS H \n"
                             + " WHERE H.GRN = '" + PRNcode + "'\n"
                             + " AND IACONO = '" + cono + "'";
                     ResultSet mRes2 = stmt.executeQuery(query2);
@@ -1771,7 +1771,7 @@ public class Select {
                             + "AND C.GRNP_NO = A.EPPA_NO\n"
                             + "WHERE A.EPPA_DUEDT BETWEEN " + newStartDate + "\n"
                             + "AND " + newEndDate + "\n"
-                            + "AND UPPER(A.EPRA_REQBY) LIKE '" + user + "'\n"
+                            + "AND UPPER(A.EPRA_REQBY) LIKE '%" + user + "%'\n"
                             + "AND A.EPPA_CONO = " + cono + " AND A.EPPA_DIVI =" + divi + "\n";
                     if (!Status.equals("")) {
                         query += "AND A.EPRA_STAT = '" + Status + "'";
@@ -1873,7 +1873,7 @@ public class Select {
                             + "AND A.EPPA_DIVI = C.GRNP_DIVI\n"
                             + "AND C.GRNP_NO = A.EPPA_NO\n"
                             + "WHERE A.EPPA_NO =" + prvno.trim() + "\n"
-                            + "AND UPPER(A.EPRA_REQBY) LIKE '" + user + "'\n"
+                            + "AND UPPER(A.EPRA_REQBY) LIKE '%" + user + "%'\n"
                             + "AND A.EPPA_CONO = " + cono + " AND A.EPPA_DIVI =" + divi + "\n"
                             + ") D LEFT JOIN (\n"
                             + " SELECT EGVONO,EGCONO,EGDIVI,EGYEA4,EGAIT4\n"
