@@ -568,8 +568,8 @@ public class Insert {
         String StrInsertHeader;
         String Ordernum = "Ordernum";
         String Process = "";
-        EPRH_COCE = get_SemiColonValue0(EPRH_COCE);
-        EPRH_SUNO = get_SemiColonValue0(EPRH_SUNO);
+//        EPRH_COCE = get_SemiColonValue0(EPRH_COCE);
+//        EPRH_SUNO = get_SemiColonValue0(EPRH_SUNO);
         EPRH_RQSDT = GetDateFormatSet(EPRH_RQSDT);
         EPRH_RQRDT = GetDateFormatSet(EPRH_RQRDT);
         EPRH_INVDT = GetDateFormatSet(EPRH_INVDT);

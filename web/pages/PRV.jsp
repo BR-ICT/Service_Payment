@@ -254,18 +254,24 @@
         <br>
 
         <label for="txtPeriod">Cost Center</label>
-        <input id="costcenter" name="costcenter" list="costcenterlist" style="margin: 0px 0px 0px 40px;width: 260px;">
-        <datalist id="costcenterlist">
-            <option value="">Select Costcenter!</option>
-        </datalist>
+        <!--        <input id="costcenter" name="costcenter" list="costcenterlist" style="margin: 0px 0px 0px 40px;width: 260px;">
+                <datalist id="costcenterlist">
+                    <option value="">Select Costcenter!</option>
+                </datalist>-->
+        <select name="costcenter" id="costcenter" style="width: 260px; margin: 0px 0px 0px 40px;">
+            <option value=""    selected="selected">Select Costcenter</option>
+        </select>
         <label for="txtPeriod">Date:</label>
         <input id="vDate" name="date" type="date" disabled="" style="margin: 0px 0px 0px 60px;">   
         <br>
         <label for="txtPeriod">Supplier</label>
-        <input id="supplier" name="supplier" list="supplierlist" style="margin: 0px 0px 0px 65px;width: 260px;">
+        <select name="supplier" id="supplier"  style="margin: 0px 0px 0px 65px;width: 260px;">
+            <option value=""    selected="selected">Select Supplier</option>
+        </select>
+<!--        <input id="supplier" name="supplier" list="supplierlist" style="margin: 0px 0px 0px 65px;width: 260px;">
         <datalist id="supplierlist">
             <option value="Test">Select Supplier</option>
-        </datalist>
+        </datalist>-->
         <label for="txtPeriod">Due Date:</label>
         <input id="vDuedate" name="duedate" type="date" style="margin: 0px 0px 0px 30px;">
         <br>
@@ -316,6 +322,8 @@
     var lastestgrninbox = "";
     var grnfromnum = false;
 //     ArrayList<String> itemlist2 = new ArrayList<String>();
+$("#costcenter").select2();
+$("#supplier").select2();
 
     var NumberField = jsGrid.NumberField;
     function DecimalField(config) {
@@ -452,7 +460,7 @@
                 },
 // INSERT ITEM FUNCTION
                 insertItem: function (item) {
-                    console.log("testing supplier costcenter");
+//                    console.log("testing supplier costcenter");
                     console.log($("#supplier").val());
                     console.log($("#costcenter").val());
                     formData = {};
@@ -705,8 +713,8 @@
             console.log(response);
             var responseObject = JSON.parse(response);
             $.each(responseObject, function (i, obj) {
-                $("#supplier").val(obj.supplier);
-                $("#costcenter").val(obj.costcenter);
+                $("#supplier").val(obj.supplier).trigger('change.select2');;
+                $("#costcenter").val(obj.costcenter).trigger('change.select2');;
             });
         });
     });
@@ -788,31 +796,31 @@
         var BankTransfer = $('input[name="paymentmethod"][value="BankTransfer"]').is(":checked");
         var deductdesc = $("#deductdesc").val();
         var check;
-        $.ajax({
-            url: './Action',
-            type: 'GET',
-            dataType: 'json',
-            data: {
-                path: "checkCostcenter",
-                divi: divi,
-                cono: cono,
-                costcenter: $("#costcenter").val()
-            },
-            async: false
-        }).done(function (response) {
-            console.log("Response checkdup" + response);
-//            Costcenter = response;
-//            console.log(checkdup);
-            $.each(response, function (i, obj) {
-                var result = obj.Check;
-                console.log("Result of costcenter" + result);
-                if (result === "0") {
-                    alert('Costcenter Does not existed!');
-                    check = true;
-                    return;
-                }
-            });
-        });
+//        $.ajax({
+//            url: './Action',
+//            type: 'GET',
+//            dataType: 'json',
+//            data: {
+//                path: "checkCostcenter",
+//                divi: divi,
+//                cono: cono,
+//                costcenter: $("#costcenter").val()
+//            },
+//            async: false
+//        }).done(function (response) {
+//            console.log("Response checkdup" + response);
+////            Costcenter = response;
+////            console.log(checkdup);
+//            $.each(response, function (i, obj) {
+//                var result = obj.Check;
+//                console.log("Result of costcenter" + result);
+//                if (result === "0") {
+//                    alert('Costcenter Does not existed!');
+//                    check = true;
+//                    return;
+//                }
+//            });
+//        });
         $.ajax({
             url: './Action',
             type: 'GET',
@@ -1134,14 +1142,18 @@
         },
         async: false
     }).done(function (response) {
-        console.log(response);
-        warehouse = response;
-        $('#supplierlist').empty().append('<option value="" selected="selected">Select Year!</option>');
-        $.each(response, function (i, obj) {
-            var div_data = "<option>" + obj.supplierlist + "</option>";
-            $(div_data).appendTo('#supplierlist');
+        $('#supplier').empty().append('<option value="" selected="selected">Select supplier!</option>');
+         $.each(response, function (i, obj) {
+                var div_data = "<option value=" + obj.suppliercode + " >" + obj.supplierlist + "</option>";
+                $(div_data).appendTo('#supplier');
+            });
+//        console.log(response);
+//        warehouse = response;
+//        $('#supplierlist').empty().append('<option value="" selected="selected">Select Year!</option>');
+//        $.each(response, function (i, obj) {
+//            var div_data = "<option>" + obj.supplierlist + "</option>";
+//            $(div_data).appendTo('#supplierlist');
         });
-    });
     //GET DATA FOR ITEM
     $.ajax({
         url: './Action',
@@ -1154,12 +1166,17 @@
         },
         async: false
     }).done(function (response) {
-        console.log(response);
-        warehouse = response;
-        $('#costcenterlist').empty().append('<option value="" selected="selected">Select Year!</option>');
+//        console.log(response);
+//        warehouse = response;
+//        $('#costcenterlist').empty().append('<option value="" selected="selected">Select Year!</option>');
+//        $.each(response, function (i, obj) {
+//            var div_data = "<option>" + obj.vAutofill + "</option>";
+//            $(div_data).appendTo('#costcenterlist');
+//        });
+        $('#costcenter').empty().append('<option value="" selected="selected">Select Costcenter!</option>');
         $.each(response, function (i, obj) {
-            var div_data = "<option>" + obj.vAutofill + "</option>";
-            $(div_data).appendTo('#costcenterlist');
+            var div_data = "<option value=" + obj.costcode + " >" + obj.vAutofill + "</option>";
+            $(div_data).appendTo('#costcenter');
         });
     });
     $("#vOrdernum").change(function () {
@@ -1210,8 +1227,9 @@
         }).done(function (response) {
             $.each(response, function (i, obj) {
                 $("#vpaymentremark").val(obj.vpaymentremark);
-                $("#costcenter").val(obj.costcenter);
-                $("#supplier").val(obj.supplier);
+                $("#costcenter").val(obj.costcenter).trigger('change.select2');
+//                console.log("costcenter")
+                $("#supplier").val(obj.supplier).trigger('change.select2');
                 $("#vDate").val(obj.vDate);
                 $("#vDuedate").val(obj.vDuedate);
                 $("#deductdesc").val(obj.deductdesc);
@@ -1283,8 +1301,8 @@
         payment = "";
         displayCurrentDate();
         $("#vOrdernum").val("");
-        $("#costcenter").val("");
-        $("#supplier").val("");
+        $("#costcenter").val("").trigger('change.select2');;
+        $("#supplier").val("").trigger('change.select2');;
         $("#vDuedate").val("");
         $("#vpaymentremark").val("");
         $("input[value='Cash']").prop("checked", false);

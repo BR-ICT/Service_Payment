@@ -46,6 +46,11 @@
         <script src="assets/jsgrid-1.5.3/src/fields/jsgrid.field.control.js"></script>
         <link rel="shortcut icon" href="images/icons/favicon.ico"/>
         <title>Service Payment: <%out.print(session.getAttribute("comp"));%></title> 
+        
+        
+        
+         <script src='assets/select2/select2.min.js' type='text/javascript'></script>
+        <link href='assets/select2/select2.min.css' rel='stylesheet' type='text/css'>
     </head>
 
     <style>

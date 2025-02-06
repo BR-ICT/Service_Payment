@@ -124,7 +124,9 @@
     .form-control[disabled],fieldset[disabled] .form-control{
         cursor:not-allowed
     }
-
+    /*    #costcenter{
+            width: 100px;
+        }*/
     td.limitext{
         white-space: nowrap;
         width: 100px;
@@ -225,19 +227,26 @@
         <input id="Purpose" name="purpose" style="margin: 0px 0px 0px 4px;">
         <br>
         <label for="txtPeriod">Cost center</label>
-        <input id="costcenter" name="costcenter" list="costcenterlist" style="width: 350px; margin: 0px 0px 0px 35px;">
-        <datalist id="costcenterlist">
-            <option value="">Select Costcenter!</option>
-        </datalist>
+        <!--<input id="costcenter" name="costcenter" list="costcenterlist" style="width: 350px; margin: 0px 0px 0px 35px;">-->
+        <!--<input id="costcenter" name="costcenter" list="costcenterlist" style="width: 350px; margin: 0px 0px 0px 35px;">-->
+        <select name="costcenter" id="costcenter" style="width: 350px; margin: 0px 0px 0px 35px;">
+            <option value=""    selected="selected">Select Costcenter</option>
+        </select>
+        <!--        <datalist id="costcenterlist">
+                    <option value="">Select Costcenter!</option>
+                </datalist>-->
         <input id="prh_fac" name="prh_fac" style="width: 30px;" disabled>
         <input id="prh_bu" name="prh_bu" style="width: 30px;" disabled>
         <input id="prh_whs" name="prh_whs" style="width: 30px;" disabled>
         <br>
         <label for="txtPeriod">Supplier</label>
-        <input id="supplier" name="supplier" list="supplierlist" style="width: 260px;margin: 0px 0px 0px 59px;">
-        <datalist id="supplierlist">
-            <option value="Test">Select Supplier</option>
-        </datalist>
+        <select name="supplier" id="supplier" style="width: 350px; margin: 0px 0px 0px 35px;">
+            <option value=""    selected="selected">Select Supplier</option>
+        </select>
+        <!--        <input id="supplier" name="supplier" list="supplierlist" style="width: 260px;margin: 0px 0px 0px 59px;">
+                <datalist id="supplierlist">
+                    <option value="Test">Select Supplier</option>
+                </datalist>-->
         <label for="txtPeriod" style="margin: 0px 0px 0px 10px;">Sup. Invoice</label>
         <input id="supinv" name="supinv" style="width: 150px;" maxlength="15">
         <br>
@@ -287,6 +296,7 @@
     var app = GetURLParameter('app');
     var updaterequesttype = "normal";
     var extramodecheck = false;
+    var itemList = ['sss', 'xxxx'];
 //-----------------------------------------------NUMBER FIELD START -----------------------------------------------
     var NumberField = jsGrid.NumberField;
     function DecimalField(config) {
@@ -314,188 +324,229 @@
 ///---------------------------------------END OF DECIMAL FIELD------------------------------
 
 
+    $(function (e) {
 
-    $("#jsGrid").jsGrid({
-        width: "100%",
-        height: "auto",
-        editing: false,
-        sorting: true,
-        paging: true,
-        filtering: false,
-        pageSize: 25,
-        heading: true,
-        inserting: false,
-        selecting: true,
-        pageLoading: false,
-        onItemUpdating: function (args) {
-            previousItem = args.previousItem;
-        },
-        onRefreshed: function (args) {
-        },
-        controller: {
-            loadData: function (filter) {
-                console.log(filter);
-                var data = $.Deferred();
-                $.ajax({
-                    type: 'GET',
-                    url: './Action',
-                    dataType: 'json',
-                    data: {
-                        path: "getItemfromRqNo",
-                        rqnum: $("#vOrdernum").val(),
-                        cono: cono,
-                        divi: divi
-                    },
-                    async: false,
-                    timeout: 60000
-                }).done(function (response) {
-                    console.log(response);
-                    response = $.grep(response, function (item) {
-                        return(!filter.RNo || (item.RNo.indexOf(filter.RNo) > -1))
-                                && (!filter.Ritemcode || (item.Ritemcode.indexOf(filter.Ritemcode) > -1))
-                                && (!filter.Rdesciprion || (item.Rdesciprion.indexOf(filter.Rdesciprion) > -1))
-                                && (!filter.Rqty || (item.Rqty.indexOf(filter.Rqty) > -1))
-                                && (!filter.Rupprice || (item.Rupprice.indexOf(filter.Rupprice) > -1))
-                                && (!filter.Rvatpercentage || (item.Rvatpercentage.indexOf(filter.Rvatpercentage) > -1))
-                                && (!filter.Rtotalvat || (item.Rtotalvat.indexOf(filter.Rtotalvat) > -1))
-                                && (!filter.Rvat || (item.Rvat.indexOf(filter.Rvat) > -1))
-                                && (!filter.Ramount || (item.Ramount.indexOf(filter.Ramount) > -1));
-                        console.log(data.resolve(response));
-                    });
-                    data.resolve(response);
-                    console.log(response);
-                    console.log("response");
-                    setTimeout(function () {
-                        calculateSum();
-                    }, 50);
-                });
-                return data.promise();
+        var myTagField = function (config) {
+            jsGrid.Field.call(this, config);
+        };
+        myTagField.prototype = new jsGrid.Field({
+            sorter: function (tag1, tag2) {
+                return tag1.localeCompare(tag2);
             },
-            // INSERT ITEM NEW
-            insertItem: function (item) {
-                var itemcode = item.Ritemcode;
-                var desciprtion = item.Rdesciprion;
-                var qty = item.Rqty;
-                var upprice = item.Rupprice;
-                var vatpercentage = $("#vat").val();
-                var desciprtion2 = desciprtion.length;
-                var ordernum = $("#vOrdernum").val();
-                if (extramodecheck) {
-                    var vatin = item.Rvat;
-                }
-                console.log("Description" + desciprtion);
-                console.log("qty" + item.Rqty);
-                if (ordernum === "") {
-                    alert("please choose ordernum");
-                    return;
-                }
-                if (itemcode === "") {
-                    alert("Please Select an Item");
-                    $("#jsGrid").jsGrid("loadData");
-                    return;
-                } else if (desciprtion === "") {
-                    alert("Please fill a Description");
-                    $("#jsGrid").jsGrid("loadData");
-                    return;
-                } else if (qty === undefined || qty === "") {
-                    alert("Please fill Quantity");
-                    $("#jsGrid").jsGrid("loadData");
-                    return;
-                } else if (upprice === undefined || upprice === "") {
-                    alert("Please Choose upprice");
-                    $("#jsGrid").jsGrid("loadData");
-                    return;
-                }
-                if (extramodecheck) {
-                    if (vatin === undefined || vatin === "") {
-                        alert("Please put VAT for extra");
+            itemTemplate: function (value) {
+
+                return value;
+            },
+            insertTemplate: function (value) {
+                var grid = this._grid;
+                var teamField = this._grid.fields[11];
+                var reitem = this._insertAuto = $("<input>").autocomplete({
+                    source: itemList,
+                    minLength: 0, // Set the minimum length to 0 to show suggestions without typing
+                    select: function (event, ui) {
+                        let text = ui.item.value;
+                        // alert(text);
+                    }
+                });
+                // Trigger the autocomplete suggestions when the input field is focused
+                reitem.on('focus', function () {
+                    reitem.autocomplete('search', '');
+                });
+                return reitem;
+            },
+            itemTemplate: function (value) {
+
+                return value;
+            },
+            insertValue: function () {
+                var revalue = this._insertAuto.val();
+                return revalue;
+            }
+
+        });
+        jsGrid.fields.myTagField = myTagField;
+        //-------------------------------NORMAL JSGRID DATA--------------------------------
+        $("#jsGrid").jsGrid({
+            width: "100%",
+            height: "auto",
+            editing: false,
+            sorting: true,
+            paging: true,
+            filtering: false,
+            pageSize: 25,
+            heading: true,
+            inserting: false,
+            selecting: true,
+            pageLoading: false,
+            onItemUpdating: function (args) {
+                previousItem = args.previousItem;
+            },
+            onRefreshed: function (args) {
+            },
+            controller: {
+                loadData: function (filter) {
+                    console.log(filter);
+                    var data = $.Deferred();
+                    $.ajax({
+                        type: 'GET',
+                        url: './Action',
+                        dataType: 'json',
+                        data: {
+                            path: "getItemfromRqNo",
+                            rqnum: $("#vOrdernum").val(),
+                            cono: cono,
+                            divi: divi
+                        },
+                        async: false,
+                        timeout: 60000
+                    }).done(function (response) {
+                        console.log(response);
+                        response = $.grep(response, function (item) {
+                            return(!filter.RNo || (item.RNo.indexOf(filter.RNo) > -1))
+                                    && (!filter.Ritemcode || (item.Ritemcode.indexOf(filter.Ritemcode) > -1))
+                                    && (!filter.Rdesciprion || (item.Rdesciprion.indexOf(filter.Rdesciprion) > -1))
+                                    && (!filter.Rqty || (item.Rqty.indexOf(filter.Rqty) > -1))
+                                    && (!filter.Rupprice || (item.Rupprice.indexOf(filter.Rupprice) > -1))
+                                    && (!filter.Rvatpercentage || (item.Rvatpercentage.indexOf(filter.Rvatpercentage) > -1))
+                                    && (!filter.Rtotalvat || (item.Rtotalvat.indexOf(filter.Rtotalvat) > -1))
+                                    && (!filter.Rvat || (item.Rvat.indexOf(filter.Rvat) > -1))
+                                    && (!filter.Ramount || (item.Ramount.indexOf(filter.Ramount) > -1));
+                            console.log(data.resolve(response));
+                        });
+                        data.resolve(response);
+                        console.log(response);
+                        console.log("response");
+                        setTimeout(function () {
+                            calculateSum();
+                        }, 50);
+                    });
+                    return data.promise();
+                },
+                // INSERT ITEM NEW
+                insertItem: function (item) {
+                    var itemcode = item.Ritemcode;
+                    var desciprtion = item.Rdesciprion;
+                    var qty = item.Rqty;
+                    var upprice = item.Rupprice;
+                    var vatpercentage = $("#vat").val();
+                    var desciprtion2 = desciprtion.length;
+                    var ordernum = $("#vOrdernum").val();
+                    if (extramodecheck) {
+                        var vatin = item.Rvat;
+                    }
+                    console.log("Description" + desciprtion);
+                    console.log("qty" + item.Rqty);
+                    if (ordernum === "") {
+                        alert("please choose ordernum");
+                        return;
+                    }
+                    if (itemcode === "") {
+                        alert("Please Select an Item");
+                        $("#jsGrid").jsGrid("loadData");
+                        return;
+                    } else if (desciprtion === "") {
+                        alert("Please fill a Description");
+                        $("#jsGrid").jsGrid("loadData");
+                        return;
+                    } else if (qty === undefined || qty === "") {
+                        alert("Please fill Quantity");
+                        $("#jsGrid").jsGrid("loadData");
+                        return;
+                    } else if (upprice === undefined || upprice === "") {
+                        alert("Please Choose upprice");
                         $("#jsGrid").jsGrid("loadData");
                         return;
                     }
-                }
-                if (qty === "") {
-                    qty = "0";
-                }
-                if (upprice === "") {
-                    upprice = "0";
-                }
-                if (vatpercentage === "") {
-                    vatpercentage = "0";
-                }
-                if (desciprtion2 > 255) {
-                    alert('Description maximum 255');
-                    return;
-                }
-                var totalbvat = (qty * upprice);
-                if (extramodecheck) {
-                    var vatamount = vatin;
-                } else if (!extramodecheck) {
-                    var vatamount = parseFloat((totalbvat * (vatpercentage / 100.00)).toFixed(2));
-                }
-                var totalamount = parseFloat((totalbvat + vatamount).toFixed(2));
-                var rqno = $("#vOrdernum").val();
-                $.ajax({
-                    url: './Action',
-                    type: 'GET',
-                    dataType: 'json',
-                    data: {
-                        path: "checkITEM",
-                        cono: cono,
-                        divi: divi,
-                        itemcode: item.Ritemcode
-                    },
-                    async: false
-                }).done(function (response) {
-                    $.each(response, function (i, obj) {
-                        var result = obj.result;
-                        console.log("result" + result)
-                        if (result === 'notexist') {
-                            alert("Item " + item.Ritemcode + " not Found");
+                    if (extramodecheck) {
+                        if (vatin === undefined || vatin === "") {
+                            alert("Please put VAT for extra");
                             $("#jsGrid").jsGrid("loadData");
                             return;
-                        } else {
-
-                            formData = {};
-                            formData.requestno = rqno;
-                            formData.itemcode = itemcode;
-                            formData.desciprtion = desciprtion;
-                            formData.qty = qty;
-                            formData.upprice = upprice;
-                            formData.vatpercentage = vatpercentage;
-                            formData.totalbvat = totalbvat;
-                            formData.vatamount = vatamount;
-                            formData.totalamount = totalamount;
-                            formData.cono = cono;
-                            formData.divi = divi;
-                            formData.path = "insertNewItemService";
-                            $.ajax({
-                                url: './Action',
-                                type: 'POST',
-                                dataType: 'json',
-                                data: formData,
-                                async: false
-                            });
-                            $("#jsGrid").jsGrid("loadData");
-                            var timer2 = setInterval(function () {
-                                SetCalculateDetailModel();
-                            }, 1000);
-                            var timer3 = setInterval(function () {
-                                updaterequesttype = "special";
-                                savetheheader();
-                                clearInterval(timer3);
-                            }, 1100);
-                            setTimeout(function () {
-                                calculateSum();
-                            }, 50);
                         }
+                    }
+                    if (qty === "") {
+                        qty = "0";
+                    }
+                    if (upprice === "") {
+                        upprice = "0";
+                    }
+                    if (vatpercentage === "") {
+                        vatpercentage = "0";
+                    }
+                    if (desciprtion2 > 255) {
+                        alert('Description maximum 255');
+                        return;
+                    }
+                    var totalbvat = (qty * upprice);
+                    if (extramodecheck) {
+                        var vatamount = vatin;
+                    } else if (!extramodecheck) {
+                        var vatamount = parseFloat((totalbvat * (vatpercentage / 100.00)).toFixed(2));
+                    }
+                    var totalamount = parseFloat((totalbvat + vatamount).toFixed(2));
+                    var rqno = $("#vOrdernum").val();
+                    $.ajax({
+                        url: './Action',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: {
+                            path: "checkITEM",
+                            cono: cono,
+                            divi: divi,
+                            itemcode: item.Ritemcode
+                        },
+                        async: false
+                    }).done(function (response) {
+                        $.each(response, function (i, obj) {
+                            var result = obj.result;
+                            console.log("result" + result)
+                            if (result === 'notexist') {
+                                alert("Item " + item.Ritemcode + " not Found");
+                                $("#jsGrid").jsGrid("loadData");
+                                return;
+                            } else {
+
+                                formData = {};
+                                formData.requestno = rqno;
+                                formData.itemcode = itemcode;
+                                formData.desciprtion = desciprtion;
+                                formData.qty = qty;
+                                formData.upprice = upprice;
+                                formData.vatpercentage = vatpercentage;
+                                formData.totalbvat = totalbvat;
+                                formData.vatamount = vatamount;
+                                formData.totalamount = totalamount;
+                                formData.cono = cono;
+                                formData.divi = divi;
+                                formData.path = "insertNewItemService";
+                                $.ajax({
+                                    url: './Action',
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    data: formData,
+                                    async: false
+                                });
+                                $("#jsGrid").jsGrid("loadData");
+                                var timer2 = setInterval(function () {
+                                    SetCalculateDetailModel();
+                                }, 1000);
+                                var timer3 = setInterval(function () {
+                                    updaterequesttype = "special";
+                                    savetheheader();
+                                    clearInterval(timer3);
+                                }, 1100);
+                                setTimeout(function () {
+                                    calculateSum();
+                                }, 50);
+                            }
+                        })
+
+
+
                     })
-
-
-
-                })
-            }
-            ,
-            updateItem: function (item) {
+                }
+                ,
+                updateItem: function (item) {
 //                alert(item.RDTOTA_KGS);
 //                console.log(item);
 //                formData = {};
@@ -522,73 +573,44 @@
 //                    savetheheader();
 //                    clearInterval(timer3);
 //                }, 1100);
-            },
-            deleteItem: function (item) {
+                },
+                deleteItem: function (item) {
 //                alert(item.RDTOTA_KGS);
 //                console.log(item);
-                formData = {};
-                formData.item = item.Ritemcode;
-                formData.ordernum = $("#vOrdernum").val();
-                formData.cono = cono;
-                formData.divi = divi;
-                formData.app = app;
-                formData.number = item.RNo;
-                formData.path = "deleteSRNLine";
-                $.ajax({
-                    url: './Action',
-                    type: 'POST',
-                    dataType: 'json',
-                    data: formData,
-                    async: false
-                });
-                $("#jsGrid").jsGrid("loadData");
-                var timer2 = setInterval(function () {
-                    SetCalculateDetailModel();
-                }, 1000);
-                var timer3 = setInterval(function () {
-                    updaterequesttype = "special";
-                    savetheheader();
-                    clearInterval(timer3);
-                }, 1100);
-            }},
-        fields: [{type: "control", width: 30,
-                itemTemplate: function (_, item) {
-                    if (item.IsTotal)
-                        return "";
-                    return jsGrid.fields.control.prototype.itemTemplate.apply(this, arguments);
-                }},
-            {title: "No.", name: "RNo", css: "limitext", type: "text", editing: false, align: "center", inserting: false, width: 30},
-            {title: "Item Code", name: "Ritemcode", css: "limitext", type: "text", editing: false, align: "left", width: 200
-                , insertTemplate: function (value) {
-                    // Create an input element with a datalist for insertion
-                    var reitem = this._insertAuto = $input = $("<input>").attr("type", "text").attr("list", "itemList");
-                    var $datalist = $("<datalist>").attr("id", "itemList");
-                    // Add options to the datalist
-                    var options = [];
+                    formData = {};
+                    formData.item = item.Ritemcode;
+                    formData.ordernum = $("#vOrdernum").val();
+                    formData.cono = cono;
+                    formData.divi = divi;
+                    formData.app = app;
+                    formData.number = item.RNo;
+                    formData.path = "deleteSRNLine";
                     $.ajax({
                         url: './Action',
-                        type: 'GET',
+                        type: 'POST',
                         dataType: 'json',
-                        data: {
-                            path: "getitemlist",
-                            cono: cono},
+                        data: formData,
                         async: false
-                    }).done(function (response) {
-                        console.log(response);
-                        $('#itemlist').empty().append('<option value="" selected="selected">Select Year!</option>');
-                        $.each(response, function (i, obj) {
-                            options.push(obj.itemlist);
-                        });
                     });
-                    for (var i = 0; i < options.length; i++) {
-                        $datalist.append($("<option>").attr("value", options[i]));
-                    }
-                    return $("<div>").append($input).append($datalist);
-                }, insertValue: function () {
-                    var revalue = this._insertAuto.val();
-                    return revalue;
-                }
-//                filterTemplate: function (value) {
+                    $("#jsGrid").jsGrid("loadData");
+                    var timer2 = setInterval(function () {
+                        SetCalculateDetailModel();
+                    }, 1000);
+                    var timer3 = setInterval(function () {
+                        updaterequesttype = "special";
+                        savetheheader();
+                        clearInterval(timer3);
+                    }, 1100);
+                }},
+            fields: [{type: "control", width: 30,
+                    itemTemplate: function (_, item) {
+                        if (item.IsTotal)
+                            return "";
+                        return jsGrid.fields.control.prototype.itemTemplate.apply(this, arguments);
+                    }},
+                {title: "No.", name: "RNo", css: "limitext", type: "text", editing: false, align: "center", inserting: false, width: 30},
+//            {title: "Item Code", name: "Ritemcode", css: "limitext", type: "text", editing: false, align: "left", width: 200
+//                , insertTemplate: function (value) {
 //                    // Create an input element with a datalist for insertion
 //                    var reitem = this._insertAuto = $input = $("<input>").attr("type", "text").attr("list", "itemList");
 //                    var $datalist = $("<datalist>").attr("id", "itemList");
@@ -604,7 +626,6 @@
 //                        async: false
 //                    }).done(function (response) {
 //                        console.log(response);
-////                        warehouse = response;
 //                        $('#itemlist').empty().append('<option value="" selected="selected">Select Year!</option>');
 //                        $.each(response, function (i, obj) {
 //                            options.push(obj.itemlist);
@@ -614,19 +635,52 @@
 //                        $datalist.append($("<option>").attr("value", options[i]));
 //                    }
 //                    return $("<div>").append($input).append($datalist);
-//                }
-//                , filterValue: function () {
+//                }, insertValue: function () {
 //                    var revalue = this._insertAuto.val();
 //                    return revalue;
 //                }
-            },
-            {title: "Description", name: "Rdesciprion", css: "limitext", type: "text", editing: false, align: "left", width: 100},
-            {title: "Qty", name: "Rqty", css: "limitext", type: "decimal", editing: false, align: "right", width: 100},
-            {title: "Up Price", name: "Rupprice", css: "limitext", type: "decimal", editing: false, align: "right", width: 100},
-            {title: "Vat(%)", name: "Rvatpercentage", css: "limitext", type: "decimal", editing: false, inserting: false, align: "right", width: 100},
-            {title: "Tota.(B.Vat)", name: "Rtotalvat", css: "limitext", type: "decimal", editing: false, inserting: false, align: "right", width: 100},
-            {title: "Vat", name: "Rvat", css: "limitext", type: "decimal", editing: true, align: "right", inserting: false, width: 100},
-            {title: "Amount", name: "Ramount", css: "limitext", type: "decimal", editing: false, align: "right", inserting: false, width: 100}]});
+////                filterTemplate: function (value) {
+////                    // Create an input element with a datalist for insertion
+////                    var reitem = this._insertAuto = $input = $("<input>").attr("type", "text").attr("list", "itemList");
+////                    var $datalist = $("<datalist>").attr("id", "itemList");
+////                    // Add options to the datalist
+////                    var options = [];
+////                    $.ajax({
+////                        url: './Action',
+////                        type: 'GET',
+////                        dataType: 'json',
+////                        data: {
+////                            path: "getitemlist",
+////                            cono: cono},
+////                        async: false
+////                    }).done(function (response) {
+////                        console.log(response);
+//////                        warehouse = response;
+////                        $('#itemlist').empty().append('<option value="" selected="selected">Select Year!</option>');
+////                        $.each(response, function (i, obj) {
+////                            options.push(obj.itemlist);
+////                        });
+////                    });
+////                    for (var i = 0; i < options.length; i++) {
+////                        $datalist.append($("<option>").attr("value", options[i]));
+////                    }
+////                    return $("<div>").append($input).append($datalist);
+////                }
+////                , filterValue: function () {
+////                    var revalue = this._insertAuto.val();
+////                    return revalue;
+////                }
+//            },
+                {title: "Item Code", name: "Ritemcode", css: "limitext", type: "myTagField", editing: false, align: "left", width: 75},
+                {title: "Description", name: "Rdesciprion", css: "limitext", type: "text", editing: false, align: "left", width: 100},
+                {title: "Qty", name: "Rqty", css: "limitext", type: "decimal", editing: false, align: "right", width: 100},
+                {title: "Up Price", name: "Rupprice", css: "limitext", type: "decimal", editing: false, align: "right", width: 100},
+                {title: "Vat(%)", name: "Rvatpercentage", css: "limitext", type: "decimal", editing: false, inserting: false, align: "right", width: 100},
+                {title: "Tota.(B.Vat)", name: "Rtotalvat", css: "limitext", type: "decimal", editing: false, inserting: false, align: "right", width: 100},
+                {title: "Vat", name: "Rvat", css: "limitext", type: "decimal", editing: true, align: "right", inserting: false, width: 100},
+                {title: "Amount", name: "Ramount", css: "limitext", type: "decimal", editing: false, align: "right", inserting: false, width: 100}]});
+    });
+
     $("#vSearch").click(function () {
         $("#jsGrid").jsGrid("loadData");
     });
@@ -648,6 +702,9 @@
     $("#vCustomer").hide();
     $("#vAdd").hide();
     $("#vDeletecustomer").hide();
+    $("#costcenter").select2();
+    $("#supplier").select2();
+
     $("#vRefresh").click(function refresh() {
         getOrdernum();
         Reset();
@@ -809,12 +866,18 @@
         },
         async: false
     }).done(function (response) {
-        console.log(response);
-        warehouse = response;
-        $('#costcenterlist').empty().append('<option value="" selected="selected">Select Year!</option>');
+//        console.log(response);
+//        warehouse = response;
+//        $('#costcenterlist').empty().append('<option value="" selected="selected">Select Costcenter!</option>');
+//        $.each(response, function (i, obj) {
+//            var div_data = "<option>" + obj.vAutofill + "</option>";
+//            $(div_data).appendTo('#costcenterlist');
+//        });
+//        
+        $('#costcenter').empty().append('<option value="" selected="selected">Select Costcenter!</option>');
         $.each(response, function (i, obj) {
-            var div_data = "<option>" + obj.vAutofill + "</option>";
-            $(div_data).appendTo('#costcenterlist');
+            var div_data = "<option value=" + obj.costcode + " >" + obj.vAutofill + "</option>";
+            $(div_data).appendTo('#costcenter');
         });
     });
     function getsupplier() {
@@ -831,11 +894,16 @@
         }).done(function (response) {
             console.log(response);
             warehouse = response;
-            $('#supplierlist').empty().append('<option value="" selected="selected">Select Year!</option>');
+            $('#supplier').empty().append('<option value="" selected="selected">Select Supplier!</option>');
             $.each(response, function (i, obj) {
-                var div_data = "<option>" + obj.supplierlist + "</option>";
-                $(div_data).appendTo('#supplierlist');
+                var div_data = "<option value=" + obj.suppliercode + " >" + obj.supplierlist + "</option>";
+                $(div_data).appendTo('#supplier');
             });
+//            $('#supplierlist').empty().append('<option value="" selected="selected">Select Year!</option>');
+//            $.each(response, function (i, obj) {
+//                var div_data = "<option>" + obj.supplierlist + "</option>";
+//                $(div_data).appendTo('#supplierlist');
+//            });
         });
     }
 //Get Order Number
@@ -874,11 +942,13 @@
         $("#vRequireDate").val("");
         $("#ContractNo").val("");
         $("#Purpose").val("");
-        $("#costcenter").val("");
+        $("#costcenter").val("").trigger('change.select2');
+        ;
         $("#prh_fac").val("");
         $("#prh_bu").val("");
         $("#prh_whs").val("");
-        $("#supplier").val("");
+        $("#supplier").val("").trigger('change.select2');
+        ;
         $("#supinv").val("");
         $("#remark").val("");
         $("#invdate").val("");
@@ -1015,31 +1085,31 @@
         }
 //        var Costcenter = response;
         var check = false;
-        $.ajax({
-            url: './Action',
-            type: 'GET',
-            dataType: 'json',
-            data: {
-                path: "checkCostcenter",
-                divi: divi,
-                cono: cono,
-                costcenter: $("#costcenter").val()
-            },
-            async: false
-        }).done(function (response) {
-            console.log("Response checkdup" + response);
-//            Costcenter = response;
-//            console.log(checkdup);
-            $.each(response, function (i, obj) {
-                var result = obj.Check;
-                console.log("Result of costcenter" + result);
-                if (result === "0") {
-                    alert('Costcenter Does not existed!');
-                    check = true;
-                    return;
-                }
-            });
-        });
+//        $.ajax({
+//            url: './Action',
+//            type: 'GET',
+//            dataType: 'json',
+//            data: {
+//                path: "checkCostcenter",
+//                divi: divi,
+//                cono: cono,
+//                costcenter: $("#costcenter").val()
+//            },
+//            async: false
+//        }).done(function (response) {
+//            console.log("Response checkdup" + response);
+////            Costcenter = response;
+////            console.log(checkdup);
+//            $.each(response, function (i, obj) {
+//                var result = obj.Check;
+//                console.log("Result of costcenter" + result);
+//                if (result === "0") {
+//                    alert('Costcenter Does not existed!');
+//                    check = true;
+//                    return;
+//                }
+//            });
+//        });
         $.ajax({
             url: './Action',
             type: 'GET',
@@ -1281,9 +1351,9 @@
             console.log("test");
             console.log(response);
             $.each(response, function (i, obj) {
-                $("#supplierlist").val(obj.supplierlist);
-                $("#costcenter").val(obj.costcenter);
-                $("#supplier").val(obj.supplier);
+//                $("#supplierlist").val(obj.supplierlist);
+                $("#costcenter").val(obj.costcenter).trigger('change.select2');
+                $("#supplier").val(obj.supplier).trigger('change.select2');
                 $("#Purpose").val(obj.Purpose);
                 $("#vRequireDate").val(obj.vRequireDate);
                 $("#vRQDate").val(obj.vRQDate);
@@ -1385,7 +1455,25 @@
     }
 
 
-
+    $.ajax({
+        url: './Action',
+        type: 'GET',
+        dataType: 'json',
+        data: {
+            path: "getitemlist",
+            cono: cono},
+        async: false
+    }).done(function (response) {
+        itemList.splice(0, itemList.length);
+        $.each(response, function (i, obj) {
+            itemList.push(response[i].itemlist);
+        });
+        console.log("test" + itemList);
+//        console.log(response);
+//        $('#itemlist').empty().append('<option value="" selected="selected">Select Year!</option>');
+//        $.each(response, function (i, obj) {
+//            options.push(obj.itemlist);
+    });
 
     Reset();
     getOrdernum();

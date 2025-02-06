@@ -104,7 +104,7 @@ public class Select {
         try {
             if (conn != null) {
                 Statement stmt = conn.createStatement();
-                String query = "SELECT TRIM(EAAITM)||' : '||TRIM(EATX40) AS resultforitem  \n"
+                String query = "SELECT TRIM(EAAITM)||' : '||TRIM(EATX40) AS resultforitem,TRIM(EAAITM) AS costcode  \n"
                         + "  FROM " + dbM3Name + ".FCHACC \n"
                         + "  WHERE EAAITP =  2 \n"
                         + "AND   EADIVI = '" + divi + "' \n"
@@ -115,6 +115,7 @@ public class Select {
                 while (mRes.next()) {
                     Map<String, Object> mMap = new HashMap<>();
                     mMap.put("vAutofill", mRes.getString("resultforitem").trim());
+                    mMap.put("costcode", mRes.getString("costcode").trim());
                     mJSonArr.put(mMap);
                 }
             } else {
@@ -185,7 +186,7 @@ public class Select {
 
         JSONArray mJSonArr = new JSONArray();
         Connection conn = ConnectDB2.ConnectionDB();
-        String Suppliercode = get_SemiColonValue0(Supplier);
+//        String Suppliercode = get_SemiColonValue0(Supplier);
         try {
             if (conn != null) {
                 Statement stmt = conn.createStatement();
@@ -193,7 +194,7 @@ public class Select {
                         + "FROM M3FDBPRD.CIDMAS \n"
                         + " WHERE IDSTAT = '20'\n"
                         + " AND IDCONO='" + cono + "'   \n"
-                        + " AND IDSUNO = '" + Suppliercode + "'";
+                        + " AND IDSUNO = '" + Supplier + "'";
                 System.out.println("Get Item Data\n" + query);
                 ResultSet mRes = stmt.executeQuery(query);
                 while (mRes.next()) {
@@ -298,7 +299,7 @@ public class Select {
         JSONArray mJSonArr = new JSONArray();
         Connection conn = ConnectDB2.ConnectionDB();
 //        String code = "TESTING";
-        supplier = get_SemiColonValue0(supplier.trim());
+//        supplier = get_SemiColonValue0(supplier.trim());
         try {
             if (conn != null) {
                 Statement stmt = conn.createStatement();
@@ -451,8 +452,8 @@ public class Select {
 
     }
 
-    public static JSONArray getOrderDataServices(String supplierdata, String cono, String divi) throws Exception {
-        String[] supplierbeforesplit = supplierdata.split(":");
+    public static JSONArray getOrderDataServices(String serviceno, String cono, String divi) throws Exception {
+        String[] supplierbeforesplit = serviceno.split(":");
         String supplier = supplierbeforesplit[0];
         JSONArray mJSonArr = new JSONArray();
         Connection conn = ConnectDB2.ConnectionDB();
@@ -460,7 +461,7 @@ public class Select {
         try {
             if (conn != null) {
                 Statement stmt = conn.createStatement();
-                String query1 = "SELECT TRIM(EPRH_COCE) ||' : '||EATX40 AS COCENEW,IDSUNO||' : '||IDSUNM AS NEWSUNO\n"
+                String query1 = "SELECT TRIM(EPRH_COCE)  AS COCENEW,IDSUNO AS NEWSUNO\n"
                         + "," + dbname + ".SERVICEHEAD.*  FROM " + dbname + ".SERVICEHEAD \n"
                         + "LEFT JOIN " + dbM3Name + ".FCHACC ON\n"
                         + "TRIM(EPRH_COCE)  = TRIM(EAAITM)\n"
@@ -470,7 +471,7 @@ public class Select {
                         + "IDSUNO = EPRH_SUNO \n"
                         + "AND IDCONO = " + dbname + ".SERVICEHEAD.EPRH_CONO\n"
                         + "AND EACONO = IDCONO\n"
-                        + "WHERE EPRH_PHNO = '" + supplierdata + "'\n"
+                        + "WHERE EPRH_PHNO = '" + serviceno + "'\n"
                         + "AND " + dbname + ".SERVICEHEAD.EPRH_CONO = '" + cono + "'\n"
                         + "AND " + dbname + ".SERVICEHEAD.EPRH_DIVI = " + divi;
                 System.out.println("Getdata1\n" + query1);
@@ -503,7 +504,7 @@ public class Select {
                     String Stattt = "";
                     Stattt = mRes1.getString("EPRH_STAT").trim();
                     mMap.put("totalall", mRes1.getString("EPRH_TOTAL"));
-                    mMap.put("vService", supplierdata);;
+                    mMap.put("vService", serviceno);;
                     mJSonArr.put(mMap);
                 }
             } else {
@@ -537,8 +538,8 @@ public class Select {
         try {
             if (conn != null) {
                 Statement stmt = conn.createStatement();
-                String query1 = "select TRIM(eaaitm)||' : '||TRIM(eatx40) AS costcenter,\n"
-                        + "idsuno||' : '||idsunm AS supplier," + dbname + ".PAYMENTHEAD.*    \n"
+                String query1 = "select TRIM(eaaitm)  AS costcenter,\n"
+                        + "idsuno AS supplier," + dbname + ".PAYMENTHEAD.*    \n"
                         + "FROM " + dbname + ".PAYMENTHEAD \n"
                         + "LEFT JOIN " + dbM3Name + ".fchacc ON eaaitm = EPPA_COCE AND EACONO = EPPA_CONO AND EADIVI=EPPA_DIVI\n"
                         + "LEFT JOIN " + dbM3Name + ".cidmas ON  EPRA_SUNO = idsuno AND IDCONO = EPPA_CONO\n"
@@ -593,16 +594,22 @@ public class Select {
         try {
             if (conn != null) {
                 Statement stmt = conn.createStatement();
-                String query1 = "SELECT IDSUNO||' : '||IDSUNM   \n"
-                        + "FROM " + dbM3Name + ".CIDMAS \n"
+                String query1 = "SELECT IDSUNO||' : '||IDSUNM   AS Supplierselect,IDSUNO AS supplier\n"
+                        + "FROM  " + dbM3Name + ".CIDMAS \n"
                         + " WHERE  IDSTAT = '20'\n"
                         + " AND IDCONO='" + cono + "'   \n"
                         + " ORDER BY IDSUNO";
+//                String query1 = "SELECT IDSUNO||' : '||IDSUNM   \n"
+//                        + "FROM " + dbM3Name + ".CIDMAS \n"
+//                        + " WHERE  IDSTAT = '20'\n"
+//                        + " AND IDCONO='" + cono + "'   \n"
+//                        + " ORDER BY IDSUNO";
                 System.out.println("Getsupplier\n" + query1);
                 ResultSet mRes1 = stmt.executeQuery(query1);
                 while (mRes1.next()) {
                     Map<String, Object> mMap = new HashMap<>();
                     mMap.put("supplierlist", mRes1.getString(1).trim());
+                    mMap.put("suppliercode", mRes1.getString(2).trim());
                     mJSonArr.put(mMap);
                 }
             } else {
@@ -677,7 +684,7 @@ public class Select {
         try {
             if (conn != null) {
                 Statement stmt = conn.createStatement();
-                String query1 = "SELECT GRN,IDSUNO||' : '||IDSUNM AS IASUNO,TRIM(EAAITM)||' : '||TRIM(EATX40) AS IBCOCE\n"
+                String query1 = "SELECT GRN,IDSUNO AS IASUNO,TRIM(EAAITM)||' : '||TRIM(EATX40) AS IBCOCE\n"
                         + "FROM " + dbname + ".sum_grn01\n"
                         + "LEFT JOIN " + dbM3Name + ".CIDMAS\n"
                         + "ON IDCONO = IACONO\n"
@@ -724,12 +731,12 @@ public class Select {
     public static JSONArray showCompletedSRN(String cono, String app, String costcenter, String divi, String user) throws Exception {
         JSONArray mJSonArr = new JSONArray();
         Connection conn = ConnectDB2.ConnectionDB();
-        String costcenter2 = null;
-        if (costcenter.contains(":")) {
-            String[] itemalldats = costcenter.split(":");
-            costcenter2 = itemalldats[0];
-
-        }
+//        String costcenter2 = null;
+//        if (costcenter.contains(":")) {
+//            String[] itemalldats = costcenter.split(":");
+//            costcenter2 = itemalldats[0];
+//
+//        }
         String query1 = null;
         String sqlgrn = "";
         switch (cono) {
@@ -778,7 +785,7 @@ public class Select {
                             + "AND b.EPRA_STAT != '99'\n"
                             + "AND GRNP_CONO = b.EPPA_CONO \n"
                             + "AND GRNP_DIVI = b.EPPA_DIVI AND b.EPPA_CONO =" + cono + " AND b.EPPA_DIVI = " + divi + ")\n"
-                            + "AND IBCOCE = TRIM('" + costcenter2 + "')\n"
+                            + "AND IBCOCE = TRIM('" + costcenter + "')\n"
                             + "AND IACONO = " + cono + "\n"
                             + "ORDER BY ICTRDT DESC,GRN DESC";
 
