@@ -684,7 +684,7 @@ public class Select {
         try {
             if (conn != null) {
                 Statement stmt = conn.createStatement();
-                String query1 = "SELECT GRN,IDSUNO AS IASUNO,TRIM(EAAITM)||' : '||TRIM(EATX40) AS IBCOCE\n"
+                String query1 = "SELECT GRN,IDSUNO AS IASUNO,TRIM(EAAITM) AS IBCOCE\n"
                         + "FROM " + dbname + ".sum_grn01\n"
                         + "LEFT JOIN " + dbM3Name + ".CIDMAS\n"
                         + "ON IDCONO = IACONO\n"
