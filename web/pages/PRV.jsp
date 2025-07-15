@@ -268,10 +268,10 @@
         <select name="supplier" id="supplier"  style="margin: 0px 0px 0px 65px;width: 260px;">
             <option value=""    selected="selected">Select Supplier</option>
         </select>
-<!--        <input id="supplier" name="supplier" list="supplierlist" style="margin: 0px 0px 0px 65px;width: 260px;">
-        <datalist id="supplierlist">
-            <option value="Test">Select Supplier</option>
-        </datalist>-->
+        <!--        <input id="supplier" name="supplier" list="supplierlist" style="margin: 0px 0px 0px 65px;width: 260px;">
+                <datalist id="supplierlist">
+                    <option value="Test">Select Supplier</option>
+                </datalist>-->
         <label for="txtPeriod">Due Date:</label>
         <input id="vDuedate" name="duedate" type="date" style="margin: 0px 0px 0px 30px;">
         <br>
@@ -322,8 +322,8 @@
     var lastestgrninbox = "";
     var grnfromnum = false;
 //     ArrayList<String> itemlist2 = new ArrayList<String>();
-$("#costcenter").select2();
-$("#supplier").select2();
+    $("#costcenter").select2();
+    $("#supplier").select2();
 
     var NumberField = jsGrid.NumberField;
     function DecimalField(config) {
@@ -487,7 +487,7 @@ $("#supplier").select2();
                                 $("#jsGrid").jsGrid("loadData");
                                 return;
                             } else if (result === 'duplicated') {
-                                alert("Invoice " + obj.invoice + " duplicated Found, the duplicated number of this Invoice is " + obj.dupgrn);
+                                alert("Invoice " + obj.invoice + " duplicated Found, the duplicated number of this Invoice is " + obj.dupgrn + " From PRV Number:" + obj.prvnum + " By user:" + obj.byuser);
                                 $("#jsGrid").jsGrid("loadData");
                                 return;
                             } else {
@@ -632,6 +632,8 @@ $("#supplier").select2();
         $("#jsGrid").jsGrid("option", "fields", columns);
     });
     $("#vSubmit").click(function () {
+        $("#vOrdernum").prop("disabled", true);
+        $("#vRefresh").prop("disabled", true);
         var ordernum = encodeURIComponent($("#vOrdernum").val());
         if (app === "ERN") {
             var url = "Report?PrvNumber=" + ordernum + "&report=Prvform" + "&cono=" + encodeURIComponent(cono) + "&divi=" + encodeURIComponent(divi);
@@ -663,11 +665,16 @@ $("#supplier").select2();
                         var ordernum = $("#vOrdernum").val();
 //                            console.log(response);
                         alert(ordernum + " has been submitted");
+                        $("#vOrdernum").prop("disabled", false);
+                        $("#vRefresh").prop("disabled", false);
                         ResetPRV();
                         modechangecheckPRV();
                         getOrdernumPRV();
 //                        console.log(response);
                     });
+                } else {
+                    $("#vOrdernum").prop("disabled", false);
+                    $("#vRefresh").prop("disabled", false);
                 }
             }
         }, 1000);
@@ -713,8 +720,10 @@ $("#supplier").select2();
             console.log(response);
             var responseObject = JSON.parse(response);
             $.each(responseObject, function (i, obj) {
-                $("#supplier").val(obj.supplier).trigger('change.select2');;
-                $("#costcenter").val(obj.costcenter).trigger('change.select2');;
+                $("#supplier").val(obj.supplier).trigger('change.select2');
+                ;
+                $("#costcenter").val(obj.costcenter).trigger('change.select2');
+                ;
             });
         });
     });
@@ -1143,17 +1152,17 @@ $("#supplier").select2();
         async: false
     }).done(function (response) {
         $('#supplier').empty().append('<option value="" selected="selected">Select supplier!</option>');
-         $.each(response, function (i, obj) {
-                var div_data = "<option value=" + obj.suppliercode + " >" + obj.supplierlist + "</option>";
-                $(div_data).appendTo('#supplier');
-            });
+        $.each(response, function (i, obj) {
+            var div_data = "<option value=" + obj.suppliercode + " >" + obj.supplierlist + "</option>";
+            $(div_data).appendTo('#supplier');
+        });
 //        console.log(response);
 //        warehouse = response;
 //        $('#supplierlist').empty().append('<option value="" selected="selected">Select Year!</option>');
 //        $.each(response, function (i, obj) {
 //            var div_data = "<option>" + obj.supplierlist + "</option>";
 //            $(div_data).appendTo('#supplierlist');
-        });
+    });
     //GET DATA FOR ITEM
     $.ajax({
         url: './Action',
@@ -1301,8 +1310,10 @@ $("#supplier").select2();
         payment = "";
         displayCurrentDate();
         $("#vOrdernum").val("");
-        $("#costcenter").val("").trigger('change.select2');;
-        $("#supplier").val("").trigger('change.select2');;
+        $("#costcenter").val("").trigger('change.select2');
+        ;
+        $("#supplier").val("").trigger('change.select2');
+        ;
         $("#vDuedate").val("");
         $("#vpaymentremark").val("");
         $("input[value='Cash']").prop("checked", false);
@@ -1399,10 +1410,12 @@ $("#supplier").select2();
             async: false
         }).done(function (response) {
             itemlistPP.splice(0, itemlistPP.length);
+//            itemlistPP.length = 0;
+//            itemlistPP = [];
             $.each(response, function (i, obj) {
                 itemlistPP.push(response[i].RQNo);
             });
-            console.log("test" + itemlistPP);
+//            console.log("test" + itemlistPP);
         });
     }
     $("#deductamount").val("0");
