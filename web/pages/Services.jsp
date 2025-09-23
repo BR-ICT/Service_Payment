@@ -716,6 +716,8 @@
     $("#vSubmit").click(function () {
         SetCalculateDetailModel();
         UpdateSRNumbers();
+        $("#vOrdernum").prop("disabled", true);
+        $("#vRefresh").prop("disabled", true);
         var ordernum = encodeURIComponent($("#vOrdernum").val());
         if (app === "ERN") {
             var url = "Report?SrnNumber=" + ordernum + "&report=Ernform" + "&cono=" + encodeURIComponent(cono) + "&divi=" + encodeURIComponent(divi);
@@ -745,11 +747,17 @@
 //                        var timer4 = setInterval(function () {
                         var ordernum = $("#vOrdernum").val();
 //                            console.log(response);
+                        $("#vOrdernum").prop("disabled", false);
+                        $("#vRefresh").prop("disabled", false);
                         alert(ordernum + " has been submitted");
                         Reset();
 //                        }, 1000);
                     });
                     window.open("?page=PRV&app=" + app, "_blank");
+                } else {
+                    $("#vOrdernum").prop("disabled", false);
+                    $("#vRefresh").prop("disabled", false);
+//                    $("#vRefresh").prop("disabled", false);
                 }
 
             }
