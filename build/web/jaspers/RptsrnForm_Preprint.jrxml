@@ -1,0 +1,500 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RptsrnForm" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="BlankPage" columnWidth="559" leftMargin="18" rightMargin="18" topMargin="18" bottomMargin="18" uuid="72fafba9-4c93-4cee-8ca2-86c885f00615">
+	<property name="ireport.zoom" value="1.3310000000000162"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DB2"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="131"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="864"/>
+	<parameter name="CompannyName" class="java.lang.String"/>
+	<parameter name="QueryStringSRN" class="java.lang.Object">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT b.*
+FROM 
+(SELECT ROWPRENUM AS ROWNUM
+FROM BRLDTA0100.ROW_PREREPORT
+WHERE ROWPRENUM BETWEEN 1 AND 10
+ORDER BY ROWPRENUM) AS a
+LEFT JOIN 
+(SELECT ROW_NUMBER() OVER (ORDER BY EPRL_ITNO) AS ROWNUM,h.EPRH_PO,h.EPRH_PHNO,h.EPRH_COCE AS CostCenter,h.EPRH_PURPOS as PurposeSample
+,SUBSTR(h.EPRH_TRDT,7,2) CONCAT '/' CONCAT SUBSTR(h.EPRH_TRDT,5,2) CONCAT '/' CONCAT SUBSTR(h.EPRH_TRDT,1,4) as DATES
+,SUBSTR(EPRH_RQRDT,7,2) CONCAT '/' CONCAT SUBSTR(EPRH_RQRDT,5,2) CONCAT '/' CONCAT SUBSTR(EPRH_RQRDT,1,4) as DueDate ,h.eprh_suno as SupplierCode   
+,sup.idsunm as SupplierName ,h.eprh_invsu as InvoiceNo ,h.eprh_aptno as ContractNo   ,h.EPRH_PHNO as ServiceRequestNo,d.eprl_pnli as Numberno 
+,EPRL_ITNO as ItemCode, EPRL_DESC Description , EPRL_QTY as Quantity , EPRL_UPRICE as UnitPrice , EPRL_VTCD, EPRL_VAT
+,ROUND(EPRL_UPRICE * EPRL_QTY,2) as EPRL_AMT ,h.EPRH_DISC as Discount,EPRH_TOTAL-h.EPRH_DISC as SumSubTotal  
+,EPRH_VTAMT as SumVat ,EPRH_TOTAL-h.EPRH_DISC+EPRH_VTAMT as SumTotal,costcenter.eatx40 as CostCenterName 
+FROM brldta0100.pur_eprhead  as h 
+LEFT JOIN  brldta0100.PUR_EPRLINE as d  ON h.EPRH_PHNO=d.EPRL_PHNO 
+LEFT JOIN  (SELECT idsuno,idsunm FROM m3fdbprd.cidmas WHERE idstat='20' AND idcono='10')as sup ON sup.idsuno=h.eprh_suno  
+LEFT JOIN  (SELECT  eaaitm,eatx40 FROM m3fdbprd.fchacc WHERE eaaitp =  2 and eadivi ='101') as costcenter ON costcenter.eaaitm=h.EPRH_COCE  
+WHERE EPRH_PHNO='3102663') AS b
+ON a.ROWNUM = b.ROWNUM]]>
+	</queryString>
+	<field name="ROWNUM" class="java.lang.Long">
+		<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+		<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+	</field>
+	<field name="EPRH_PO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="EPRH_PO"/>
+		<property name="com.jaspersoft.studio.field.label" value="EPRH_PO"/>
+	</field>
+	<field name="EPRH_PHNO" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EPRH_PHNO"/>
+		<property name="com.jaspersoft.studio.field.label" value="EPRH_PHNO"/>
+	</field>
+	<field name="COSTCENTER" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="COSTCENTER"/>
+		<property name="com.jaspersoft.studio.field.label" value="COSTCENTER"/>
+	</field>
+	<field name="PURPOSESAMPLE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PURPOSESAMPLE"/>
+		<property name="com.jaspersoft.studio.field.label" value="PURPOSESAMPLE"/>
+	</field>
+	<field name="DATES" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DATES"/>
+		<property name="com.jaspersoft.studio.field.label" value="DATES"/>
+	</field>
+	<field name="DUEDATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DUEDATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="DUEDATE"/>
+	</field>
+	<field name="SUPPLIERCODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SUPPLIERCODE"/>
+		<property name="com.jaspersoft.studio.field.label" value="SUPPLIERCODE"/>
+	</field>
+	<field name="SUPPLIERNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SUPPLIERNAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="SUPPLIERNAME"/>
+	</field>
+	<field name="INVOICENO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="INVOICENO"/>
+		<property name="com.jaspersoft.studio.field.label" value="INVOICENO"/>
+	</field>
+	<field name="CONTRACTNO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CONTRACTNO"/>
+		<property name="com.jaspersoft.studio.field.label" value="CONTRACTNO"/>
+	</field>
+	<field name="SERVICEREQUESTNO" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="SERVICEREQUESTNO"/>
+		<property name="com.jaspersoft.studio.field.label" value="SERVICEREQUESTNO"/>
+	</field>
+	<field name="NUMBERNO" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="NUMBERNO"/>
+		<property name="com.jaspersoft.studio.field.label" value="NUMBERNO"/>
+	</field>
+	<field name="ITEMCODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ITEMCODE"/>
+		<property name="com.jaspersoft.studio.field.label" value="ITEMCODE"/>
+	</field>
+	<field name="DESCRIPTION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DESCRIPTION"/>
+		<property name="com.jaspersoft.studio.field.label" value="DESCRIPTION"/>
+	</field>
+	<field name="QUANTITY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="QUANTITY"/>
+		<property name="com.jaspersoft.studio.field.label" value="QUANTITY"/>
+	</field>
+	<field name="UNITPRICE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="UNITPRICE"/>
+		<property name="com.jaspersoft.studio.field.label" value="UNITPRICE"/>
+	</field>
+	<field name="EPRL_VTCD" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EPRL_VTCD"/>
+		<property name="com.jaspersoft.studio.field.label" value="EPRL_VTCD"/>
+	</field>
+	<field name="EPRL_VAT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EPRL_VAT"/>
+		<property name="com.jaspersoft.studio.field.label" value="EPRL_VAT"/>
+	</field>
+	<field name="EPRL_AMT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EPRL_AMT"/>
+		<property name="com.jaspersoft.studio.field.label" value="EPRL_AMT"/>
+	</field>
+	<field name="DISCOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="DISCOUNT"/>
+		<property name="com.jaspersoft.studio.field.label" value="DISCOUNT"/>
+	</field>
+	<field name="SUMSUBTOTAL" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="SUMSUBTOTAL"/>
+		<property name="com.jaspersoft.studio.field.label" value="SUMSUBTOTAL"/>
+	</field>
+	<field name="SUMVAT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="SUMVAT"/>
+		<property name="com.jaspersoft.studio.field.label" value="SUMVAT"/>
+	</field>
+	<field name="SUMTOTAL" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="SUMTOTAL"/>
+		<property name="com.jaspersoft.studio.field.label" value="SUMTOTAL"/>
+	</field>
+	<field name="COSTCENTERNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="COSTCENTERNAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="COSTCENTERNAME"/>
+	</field>
+	<group name="PHNOOO">
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band height="168">
+				<staticText>
+					<reportElement x="345" y="2" width="132" height="16" forecolor="#000099" uuid="7befd758-b357-4d18-9a2b-1d6577e3e050"/>
+					<textElement>
+						<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+					</textElement>
+					<text><![CDATA[ส่วนลด (Discount)]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="345" y="22" width="132" height="16" forecolor="#000099" uuid="f5b17fbc-dcee-4247-989d-6b494a43495f"/>
+					<textElement>
+						<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+					</textElement>
+					<text><![CDATA[จำนวนเงินรวม(Sub total)]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="345" y="41" width="132" height="17" forecolor="#000099" uuid="85cf45aa-9f4d-40ab-9121-f533a2ead9ce"/>
+					<textElement>
+						<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+					</textElement>
+					<text><![CDATA[ภาษีมูลค่าเพิ่ม(vat) %]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="345" y="63" width="132" height="20" forecolor="#000099" uuid="bcb6b21c-4575-4695-9e53-93d02f4acdb5"/>
+					<textElement>
+						<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+					</textElement>
+					<text><![CDATA[จำนวนเงินรวมทั้งสิ้น(Total)]]></text>
+				</staticText>
+				<line>
+					<reportElement x="557" y="-1" width="1" height="87" forecolor="#000099" uuid="e9feb0f8-b09b-4e27-8cfc-6f74cedfd7c1"/>
+				</line>
+				<line>
+					<reportElement x="345" y="85" width="212" height="1" forecolor="#000099" uuid="75a7dce9-0c99-41e7-9c4a-79515ec22f7e"/>
+				</line>
+				<line>
+					<reportElement x="345" y="60" width="212" height="1" forecolor="#000099" uuid="c61eb1ec-8ebd-453b-99f1-93526c72b7ca"/>
+				</line>
+				<line>
+					<reportElement x="345" y="39" width="212" height="1" forecolor="#000099" uuid="1523bc90-6802-4e04-bade-44e9b02d331e"/>
+				</line>
+				<line>
+					<reportElement x="345" y="20" width="211" height="1" forecolor="#000099" uuid="3c9cd827-5066-4f8c-a6bb-9e37ef456b1f"/>
+				</line>
+				<line>
+					<reportElement x="344" y="0" width="1" height="86" forecolor="#000099" uuid="2cb8dd56-c2b8-471a-8d2c-859d38b7f438"/>
+				</line>
+				<line>
+					<reportElement x="477" y="0" width="1" height="85" forecolor="#000099" uuid="d1dc970e-95e7-4743-92a9-0227343f923d"/>
+				</line>
+				<staticText>
+					<reportElement x="4" y="89" width="89" height="35" forecolor="#000099" uuid="ba5eaf9e-88a4-4885-8350-28efc631ab3b"/>
+					<textElement>
+						<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+					</textElement>
+					<text><![CDATA[จัดทำโดย
+Prepared by]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="4" y="127" width="89" height="27" forecolor="#000099" uuid="54c9c435-8e68-43a2-a277-1163471f4732"/>
+					<textElement>
+						<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+					</textElement>
+					<text><![CDATA[วันที่
+Date]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="197" y="89" width="89" height="35" forecolor="#000099" uuid="25681688-15a7-4b38-9492-4b1d8862dd17"/>
+					<textElement>
+						<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+					</textElement>
+					<text><![CDATA[ตรวจสอบโดย
+Checked by]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="389" y="90" width="65" height="34" forecolor="#000099" uuid="9066a540-c31c-46b9-8283-84959070db1e"/>
+					<textElement>
+						<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+					</textElement>
+					<text><![CDATA[อนุมัติโดย
+Approved by]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="93" y="90" width="103" height="34" forecolor="#000099" uuid="b87c073d-8ed8-4bb3-a986-3c1cc1305227"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="TH SarabunPSK" size="14" isBold="false"/>
+					</textElement>
+					<text><![CDATA[............................................]]></text>
+				</staticText>
+				<line>
+					<reportElement x="3" y="89" width="554" height="1" forecolor="#000099" uuid="cdea0bf4-77ca-475f-b4eb-37285a7c2840"/>
+				</line>
+				<line>
+					<reportElement x="3" y="89" width="1" height="79" forecolor="#000099" uuid="25950275-51ab-45b4-b5f8-19df12eca7df"/>
+				</line>
+				<line>
+					<reportElement x="557" y="89" width="1" height="79" forecolor="#000099" uuid="9b97872a-c556-4927-afbd-12891d58a4a4"/>
+				</line>
+				<staticText>
+					<reportElement x="93" y="127" width="103" height="27" forecolor="#000099" uuid="1dfe8bdc-253e-4988-944d-ad2ac8f444bc"/>
+					<textElement>
+						<font fontName="TH SarabunPSK" size="14" isBold="false"/>
+					</textElement>
+					<text><![CDATA[           /         /]]></text>
+				</staticText>
+				<line>
+					<reportElement x="196" y="89" width="1" height="79" forecolor="#000099" uuid="2941eea7-0b6c-462e-925f-d3ab85bcc7c2"/>
+				</line>
+				<line>
+					<reportElement x="388" y="89" width="1" height="79" forecolor="#000099" uuid="4c15b51b-d3fe-42d2-97f1-942a5ad42b4e"/>
+				</line>
+				<line>
+					<reportElement x="4" y="167" width="553" height="1" forecolor="#000099" uuid="40202421-03d5-4a5e-9042-7d692d75b245"/>
+				</line>
+				<staticText>
+					<reportElement x="286" y="90" width="103" height="34" forecolor="#000099" uuid="e78591a4-28a5-48ac-8dc3-2ff67e80b5a5"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="TH SarabunPSK" size="14" isBold="false"/>
+					</textElement>
+					<text><![CDATA[............................................]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="197" y="127" width="89" height="27" forecolor="#000099" uuid="3b845c8f-7f98-424d-bf6d-6953b7b4ee97"/>
+					<textElement>
+						<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+					</textElement>
+					<text><![CDATA[วันที่
+Date]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="286" y="127" width="103" height="27" forecolor="#000099" uuid="6345170c-5d1d-439b-90a4-46cdcf6b0c36"/>
+					<textElement>
+						<font fontName="TH SarabunPSK" size="14" isBold="false"/>
+					</textElement>
+					<text><![CDATA[           /         /]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="454" y="90" width="103" height="34" forecolor="#000099" uuid="c9631ea4-2aef-4d2c-94cb-84257a8dcf56"/>
+					<textElement verticalAlignment="Bottom">
+						<font fontName="TH SarabunPSK" size="14" isBold="false"/>
+					</textElement>
+					<text><![CDATA[............................................]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="389" y="127" width="65" height="27" forecolor="#000099" uuid="e99211ed-1feb-4f78-8c1c-137e186e616f"/>
+					<textElement>
+						<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+					</textElement>
+					<text><![CDATA[วันที่
+Date]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="454" y="127" width="103" height="27" forecolor="#000099" uuid="96fbe3ab-b135-41e0-8c2f-520dc43640f4"/>
+					<textElement>
+						<font fontName="TH SarabunPSK" size="14" isBold="false"/>
+					</textElement>
+					<text><![CDATA[           /         /]]></text>
+				</staticText>
+				<line>
+					<reportElement x="2" y="0" width="555" height="1" forecolor="#000099" uuid="0a243e35-9d9d-4dbb-9535-67dd9b8d8e2d"/>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="347" splitType="Stretch">
+			<image>
+				<reportElement x="2" y="0" width="80" height="68" uuid="fd3041ed-e083-4559-9e34-69d88d9b2c36"/>
+				<imageExpression><![CDATA["icon.png"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="125" y="159" width="276" height="20" forecolor="#000099" uuid="a7b16304-4459-4db5-ae94-4fe1416b61f7"/>
+				<textElement textAlignment="Center">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ชื่อแผนก / Department]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="3" y="209" width="555" height="20" forecolor="#000099" uuid="01223f12-bc11-407d-b410-8c8019b4a4d2"/>
+				<textElement>
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ข้อมูลผู้ขาย/Supplier Info]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="3" y="259" width="138" height="20" forecolor="#000099" uuid="6e17cfe2-ec08-4aab-93f7-51907f0951d2"/>
+				<textElement textAlignment="Center">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ใบส่งของ / Invoice No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="141" y="259" width="203" height="20" forecolor="#000099" uuid="e53487cf-0482-4399-9bf3-a3a270545f09"/>
+				<textElement textAlignment="Center">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[เลขที่สัญญา / Contract No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="345" y="259" width="212" height="20" forecolor="#000099" uuid="80ec0ebe-8b6c-41c2-800f-60d586ee5979"/>
+				<textElement textAlignment="Center">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[เลขที่บริการ / Service RequestNo.]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch">
+			<line>
+				<reportElement x="3" y="-259" width="555" height="1" forecolor="#000099" uuid="1a8593e1-ddcc-4177-abd3-3f7a34b5158e"/>
+			</line>
+			<line>
+				<reportElement x="3" y="-191" width="554" height="1" forecolor="#000099" uuid="af1586ed-60d5-482e-b0fd-c84770a9a75b"/>
+			</line>
+			<line>
+				<reportElement x="557" y="-258" width="1" height="258" forecolor="#000099" uuid="87ec198d-4d07-4874-85da-95edcbfa68dc"/>
+			</line>
+			<line>
+				<reportElement x="2" y="-259" width="1" height="258" forecolor="#000099" uuid="728c7c1d-62b9-486a-a0e2-14bad4e8f5fd"/>
+			</line>
+			<line>
+				<reportElement x="3" y="-89" width="555" height="1" forecolor="#000099" uuid="3fd32b55-a696-4f35-9224-8fd0e5e2afad"/>
+			</line>
+			<line>
+				<reportElement x="3" y="-37" width="554" height="1" forecolor="#000099" uuid="f6f31cc3-62be-4171-a956-a55fb2ff374f"/>
+			</line>
+			<line>
+				<reportElement x="140" y="-89" width="1" height="52" forecolor="#000099" uuid="cd3a48db-d3f1-4cb7-8cbf-8070172d16af"/>
+			</line>
+			<line>
+				<reportElement x="344" y="-88" width="1" height="52" forecolor="#000099" uuid="2dda912b-0b05-442f-aa2d-c0c65ede26e3"/>
+			</line>
+			<line>
+				<reportElement x="26" y="-36" width="1" height="35" forecolor="#000099" uuid="372c97f5-312d-43d7-bc64-60d8d52e7e73"/>
+			</line>
+			<line>
+				<reportElement x="85" y="-36" width="1" height="36" forecolor="#000099" uuid="4dc7eb05-176f-4bec-8967-b66e2e338c6e"/>
+			</line>
+			<line>
+				<reportElement x="344" y="-36" width="1" height="35" forecolor="#000099" uuid="f8b5306a-0209-4504-b3f9-7ec5f10d42a2"/>
+			</line>
+			<line>
+				<reportElement x="2" y="-1" width="556" height="1" forecolor="#000099" uuid="a3e68f05-d1e0-4c0a-9f1d-fe3bb3e01cb3"/>
+			</line>
+			<line>
+				<reportElement x="388" y="-36" width="1" height="35" forecolor="#000099" uuid="65fe8317-4f79-4d65-b394-2665bdb1ed4d"/>
+			</line>
+			<line>
+				<reportElement x="477" y="-36" width="1" height="35" forecolor="#000099" uuid="81db0dd1-2545-43fe-8eda-a5a2d1edb23a"/>
+			</line>
+			<line>
+				<reportElement x="3" y="-139" width="554" height="1" forecolor="#000099" uuid="40ae9565-0d81-47fc-ad34-2407ba537fd7"/>
+			</line>
+			<line>
+				<reportElement x="124" y="-190" width="1" height="52" forecolor="#000099" uuid="df653de7-7795-4478-bacf-687faac9894e"/>
+			</line>
+			<line>
+				<reportElement x="401" y="-191" width="1" height="52" forecolor="#000099" uuid="e9903aa4-c38d-4e9a-ac4e-9be81930a62e"/>
+			</line>
+			<staticText>
+				<reportElement x="125" y="-249" width="276" height="41" forecolor="#000099" uuid="a35413d7-6863-470d-9199-9b5276ab6e8e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK" size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Service Receipt Note (M3) ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="431" y="-249" width="35" height="20" forecolor="#000099" uuid="540b25f2-1485-460b-b01d-260fe5e17349"/>
+				<textElement>
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="431" y="-228" width="35" height="20" forecolor="#000099" uuid="ff0b90fb-5f66-4970-81c7-e68772718a31"/>
+				<textElement>
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="3" y="-188" width="121" height="20" forecolor="#000099" uuid="387a26ce-5f15-4cc5-ab8e-f31d8dff97b6"/>
+				<textElement textAlignment="Center">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[แผนก / Costcenter]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="402" y="-188" width="155" height="20" forecolor="#000099" uuid="29449788-58ae-4d2a-80a9-ed92309ff6cf"/>
+				<textElement textAlignment="Center">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[วันครบกำหนด / Due Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="3" y="-36" width="23" height="35" forecolor="#000099" uuid="d5a793ba-b8be-4e41-adf4-37beaa5abf02"/>
+				<textElement textAlignment="Center">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[เลขที่                             NO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="27" y="-36" width="58" height="36" forecolor="#000099" uuid="7d2c3a18-6b7b-4db7-ba26-76942f34c493"/>
+				<textElement textAlignment="Center">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[รหัสสินค้า Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="86" y="-36" width="258" height="35" forecolor="#000099" uuid="0cc0d999-68af-4720-98ed-d1e2db53c885"/>
+				<textElement textAlignment="Center">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[รายการสินค้า 
+Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="344" y="-37" width="44" height="36" forecolor="#000099" uuid="71b99cab-4129-4a73-ab29-a4b144bce688"/>
+				<textElement textAlignment="Center">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[จำนวน QTY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="389" y="-36" width="88" height="35" forecolor="#000099" uuid="c979ef32-d8e9-42ca-afb3-9ee7567f648e"/>
+				<textElement textAlignment="Center">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ราคาต่อหน่วย 
+Unit Price]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="478" y="-36" width="79" height="35" forecolor="#000099" uuid="832282d0-7b36-4da6-93c2-78622985fad3"/>
+				<textElement textAlignment="Center">
+					<font fontName="TH SarabunPSK" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[จำนวนเงิน 
+Amount]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="22" splitType="Stretch">
+			<line>
+				<reportElement x="2" y="-1" width="1" height="23" forecolor="#000099" uuid="874b2063-7867-4af6-86c3-0978c88713f1"/>
+			</line>
+			<line>
+				<reportElement x="557" y="-1" width="1" height="22" forecolor="#000099" uuid="8d998798-a571-4910-8dc6-65166071ae9b"/>
+			</line>
+		</band>
+	</detail>
+	<pageFooter>
+		<band/>
+	</pageFooter>
+</jasperReport>

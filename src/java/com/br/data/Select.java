@@ -899,8 +899,6 @@ public class Select {
         String itemcode = null;
         String existornot = "notexist";
         String grndupnum = "";
-        String byuser = "";
-        String prvnum = "";
         String query1 = null;
         String query2 = null;
         String query3 = null;
@@ -1020,22 +1018,12 @@ public class Select {
                 }
                 if (duplicated.equals("EXIST")) {
                     existornot = "duplicated";
-//                    query4 = " SELECT GRNP_GRN FROM " + dbname + ".PAYMENTLINEGRN p \n"
-//                            + " WHERE TRIM(GRNP_INVC)  = '" + resultInvoice + "'\n"
-//                            + " AND GRNP_CONO = '" + cono + "' AND GRNP_DIVI  = '" + divi + "'";
-                    query4 = "  SELECT GRNP_GRN,GRNP_NO,EPRA_REQBY\n"
-                            + "  FROM " + dbname + ".PAYMENTLINEGRN plg\n"
-                            + "  LEFT JOIN " + dbname + ".PAYMENTHEAD ph\n"
-                            + "  ON plg.GRNP_CONO = ph.EPPA_CONO\n"
-                            + "  AND plg.GRNP_DIVI = ph.EPPA_DIVI\n"
-                            + "  AND plg.GRNP_NO = ph.EPPA_NO\n"
+                    query4 = " SELECT GRNP_GRN FROM BRLDTA0100.PAYMENTLINEGRN p \n"
                             + " WHERE TRIM(GRNP_INVC)  = '" + resultInvoice + "'\n"
                             + " AND GRNP_CONO = '" + cono + "' AND GRNP_DIVI  = '" + divi + "'";
                     ResultSet mRes4 = stmt.executeQuery(query4);
                     while (mRes4.next()) {
-                        grndupnum = mRes4.getString("GRNP_GRN").trim();
-                        prvnum = mRes4.getString("GRNP_NO").trim();
-                        byuser = mRes4.getString("EPRA_REQBY").trim();
+                        grndupnum = mRes4.getString(1).trim();
                     }
                 } else if (result.equals("EXIST")) {
                     existornot = "exist";
@@ -1045,8 +1033,6 @@ public class Select {
                 Map<String, Object> mMap = new HashMap<>();
                 mMap.put("result", existornot);
                 mMap.put("dupgrn", grndupnum);
-                mMap.put("prvnum", prvnum);
-                mMap.put("byuser", byuser);
                 mMap.put("invoice", resultInvoice);
                 mJSonArr.put(mMap);
 

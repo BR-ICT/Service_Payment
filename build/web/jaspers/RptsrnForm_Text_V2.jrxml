@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RptsrnForm" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="BlankPage" columnWidth="559" leftMargin="18" rightMargin="18" topMargin="18" bottomMargin="18" uuid="72fafba9-4c93-4cee-8ca2-86c885f00615">
+	<property name="ireport.zoom" value="1.3310000000000162"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DB2"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="139"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="856"/>
+	<property name="com.jaspersoft.studio.report.description" value=""/>
+	<parameter name="row_split" class="java.math.BigDecimal">
+		<defaultValueExpression><![CDATA[5]]></defaultValueExpression>
+	</parameter>
+	<parameter name="QueryStringSRN" class="java.lang.Object">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT a.ROWNUM,ROW_COUNT,ROW_SPLIT, PAGE, TOTAL_PAGE,EPRH_PO, EPRH_PHNO, COSTCENTER, PURPOSESAMPLE, DATES, DUEDATE, SUPPLIERCODE, SUPPLIERNAME, INVOICENO, CONTRACTNO, SERVICEREQUESTNO, NUMBERNO, ITEMCODE, DESCRIPTION, QUANTITY
+, UNITPRICE, EPRL_VTCD, EPRL_VAT, EPRL_AMT, COALESCE(DISCOUNT,0) AS DISCOUNT, COALESCE(SUMSUBTOTAL,0) AS SUMSUBTOTAL, COALESCE(SUMVAT,0) AS SUMVAT, COALESCE(SUMTOTAL,0) AS SUMTOTAL, COSTCENTERNAME
+FROM 
+(SELECT ROWPRENUM AS ROWNUM
+FROM BRLDTA0100.ROW_PREREPORT
+ORDER BY ROWPRENUM) AS a
+LEFT JOIN 
+(SELECT ROW_NUMBER() OVER (ORDER BY EPRL_ITNO) AS ROWNUM,h.EPRH_PO,h.EPRH_PHNO,h.EPRH_COCE AS CostCenter,h.EPRH_PURPOS as PurposeSample
+,SUBSTR(h.EPRH_TRDT,7,2) CONCAT '/' CONCAT SUBSTR(h.EPRH_TRDT,5,2) CONCAT '/' CONCAT SUBSTR(h.EPRH_TRDT,1,4) as DATES
+,SUBSTR(EPRH_RQRDT,7,2) CONCAT '/' CONCAT SUBSTR(EPRH_RQRDT,5,2) CONCAT '/' CONCAT SUBSTR(EPRH_RQRDT,1,4) as DueDate ,h.eprh_suno as SupplierCode   
+,sup.idsunm as SupplierName ,h.eprh_invsu as InvoiceNo ,h.eprh_aptno as ContractNo   ,h.EPRH_PHNO as ServiceRequestNo,d.eprl_pnli as Numberno 
+,EPRL_ITNO as ItemCode, EPRL_DESC Description , EPRL_QTY as Quantity , EPRL_UPRICE as UnitPrice , EPRL_VTCD, EPRL_VAT
+,ROUND(EPRL_UPRICE * EPRL_QTY,2) as EPRL_AMT ,h.EPRH_DISC as Discount,EPRH_TOTAL-h.EPRH_DISC as SumSubTotal  
+,EPRH_VTAMT as SumVat ,EPRH_TOTAL-h.EPRH_DISC+EPRH_VTAMT as SumTotal,costcenter.eatx40 as CostCenterName 
+FROM brldta0100.pur_eprhead  as h 
+LEFT JOIN  brldta0100.PUR_EPRLINE as d  ON h.EPRH_PHNO=d.EPRL_PHNO 
+LEFT JOIN  (SELECT idsuno,idsunm FROM m3fdbprd.cidmas WHERE idstat='20' AND idcono='10')as sup ON sup.idsuno=h.eprh_suno  
+LEFT JOIN  (SELECT  eaaitm,eatx40 FROM m3fdbprd.fchacc WHERE eaaitp =  2 and eadivi ='101') as costcenter ON costcenter.eaaitm=h.EPRH_COCE  
+WHERE EPRH_PHNO = '3102663') AS b
+ON a.ROWNUM = b.ROWNUM
+LEFT JOIN 
+(SELECT COUNT(*) AS ROW_COUNT,$P!{row_split} AS ROW_SPLIT,CAST(CEIL(CAST((COUNT(*)) AS DECIMAL(15,4)) / $P!{row_split}) AS INT) AS PAGE, $P!{row_split} * CAST(CEIL(CAST((COUNT(*)) AS DECIMAL(15,4)) / $P!{row_split}) AS INT) TOTAL_PAGE
+FROM  BRLDTA0100.PUR_EPRLINE 
+WHERE EPRL_PHNO='3102663') AS c
+ON 1 = 1
+WHERE a.ROWNUM BETWEEN 1 AND TOTAL_PAGE
+ORDER BY a.ROWNUM]]>
+	</queryString>
+	<field name="ROWNUM" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="ROWNUM"/>
+		<property name="com.jaspersoft.studio.field.label" value="ROWNUM"/>
+	</field>
+	<field name="ROW_COUNT" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="ROW_COUNT"/>
+		<property name="com.jaspersoft.studio.field.label" value="ROW_COUNT"/>
+	</field>
+	<field name="ROW_SPLIT" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="ROW_SPLIT"/>
+		<property name="com.jaspersoft.studio.field.label" value="ROW_SPLIT"/>
+	</field>
+	<field name="PAGE" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="PAGE"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAGE"/>
+	</field>
+	<field name="TOTAL_PAGE" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="TOTAL_PAGE"/>
+		<property name="com.jaspersoft.studio.field.label" value="TOTAL_PAGE"/>
+	</field>
+	<field name="EPRH_PO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="EPRH_PO"/>
+		<property name="com.jaspersoft.studio.field.label" value="EPRH_PO"/>
+	</field>
+	<field name="EPRH_PHNO" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EPRH_PHNO"/>
+		<property name="com.jaspersoft.studio.field.label" value="EPRH_PHNO"/>
+	</field>
+	<field name="COSTCENTER" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="COSTCENTER"/>
+		<property name="com.jaspersoft.studio.field.label" value="COSTCENTER"/>
+	</field>
+	<field name="PURPOSESAMPLE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PURPOSESAMPLE"/>
+		<property name="com.jaspersoft.studio.field.label" value="PURPOSESAMPLE"/>
+	</field>
+	<field name="DATES" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DATES"/>
+		<property name="com.jaspersoft.studio.field.label" value="DATES"/>
+	</field>
+	<field name="DUEDATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DUEDATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="DUEDATE"/>
+	</field>
+	<field name="SUPPLIERCODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SUPPLIERCODE"/>
+		<property name="com.jaspersoft.studio.field.label" value="SUPPLIERCODE"/>
+	</field>
+	<field name="SUPPLIERNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SUPPLIERNAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="SUPPLIERNAME"/>
+	</field>
+	<field name="INVOICENO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="INVOICENO"/>
+		<property name="com.jaspersoft.studio.field.label" value="INVOICENO"/>
+	</field>
+	<field name="CONTRACTNO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CONTRACTNO"/>
+		<property name="com.jaspersoft.studio.field.label" value="CONTRACTNO"/>
+	</field>
+	<field name="SERVICEREQUESTNO" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="SERVICEREQUESTNO"/>
+		<property name="com.jaspersoft.studio.field.label" value="SERVICEREQUESTNO"/>
+	</field>
+	<field name="NUMBERNO" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="NUMBERNO"/>
+		<property name="com.jaspersoft.studio.field.label" value="NUMBERNO"/>
+	</field>
+	<field name="ITEMCODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ITEMCODE"/>
+		<property name="com.jaspersoft.studio.field.label" value="ITEMCODE"/>
+	</field>
+	<field name="DESCRIPTION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DESCRIPTION"/>
+		<property name="com.jaspersoft.studio.field.label" value="DESCRIPTION"/>
+	</field>
+	<field name="QUANTITY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="QUANTITY"/>
+		<property name="com.jaspersoft.studio.field.label" value="QUANTITY"/>
+	</field>
+	<field name="UNITPRICE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="UNITPRICE"/>
+		<property name="com.jaspersoft.studio.field.label" value="UNITPRICE"/>
+	</field>
+	<field name="EPRL_VTCD" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EPRL_VTCD"/>
+		<property name="com.jaspersoft.studio.field.label" value="EPRL_VTCD"/>
+	</field>
+	<field name="EPRL_VAT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EPRL_VAT"/>
+		<property name="com.jaspersoft.studio.field.label" value="EPRL_VAT"/>
+	</field>
+	<field name="EPRL_AMT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EPRL_AMT"/>
+		<property name="com.jaspersoft.studio.field.label" value="EPRL_AMT"/>
+	</field>
+	<field name="DISCOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="DISCOUNT"/>
+		<property name="com.jaspersoft.studio.field.label" value="DISCOUNT"/>
+	</field>
+	<field name="SUMSUBTOTAL" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="SUMSUBTOTAL"/>
+		<property name="com.jaspersoft.studio.field.label" value="SUMSUBTOTAL"/>
+	</field>
+	<field name="SUMVAT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="SUMVAT"/>
+		<property name="com.jaspersoft.studio.field.label" value="SUMVAT"/>
+	</field>
+	<field name="SUMTOTAL" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="SUMTOTAL"/>
+		<property name="com.jaspersoft.studio.field.label" value="SUMTOTAL"/>
+	</field>
+	<field name="COSTCENTERNAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="COSTCENTERNAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="COSTCENTERNAME"/>
+	</field>
+	<variable name="EPRH_PHNO_1" class="java.math.BigDecimal" calculation="First">
+		<variableExpression><![CDATA[$F{EPRH_PHNO}]]></variableExpression>
+	</variable>
+	<variable name="field1_1" class="java.lang.Integer" resetType="Page" calculation="Count">
+		<variableExpression><![CDATA[]]></variableExpression>
+	</variable>
+	<group name="PHNOOO" isReprintHeaderOnEachPage="true" keepTogether="true">
+		<groupExpression><![CDATA[$F{EPRH_PHNO}]]></groupExpression>
+		<groupHeader>
+			<band height="218">
+				<textField>
+					<reportElement x="466" y="21" width="91" height="20" uuid="a6da1d56-fa4d-461b-825f-863d61058a97"/>
+					<textElement>
+						<font fontName="TH SarabunPSK" size="14"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{DATES}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="2" y="83" width="122" height="20" uuid="952dc46b-276c-4d91-abcb-80e4b087b58d"/>
+					<textElement textAlignment="Center">
+						<font fontName="TH SarabunPSK" size="14"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{COSTCENTER}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="466" y="0" width="91" height="20" uuid="c44040e8-9f43-47f7-896d-62d6fb6a154a"/>
+					<textElement>
+						<font fontName="TH SarabunPSK" size="14"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{EPRH_PHNO}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="126" y="141" width="276" height="20" uuid="ef2f9aa2-7e57-476f-967d-158ac3401f87"/>
+					<textElement textAlignment="Center" verticalAlignment="Top">
+						<font fontName="TH SarabunPSK" size="14"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{COSTCENTERNAME}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="403" y="141" width="155" height="20" uuid="e1c0f240-5711-4f71-b85d-1a71c4b10c03"/>
+					<textElement textAlignment="Center">
+						<font fontName="TH SarabunPSK" size="14"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{DUEDATE}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="3" y="189" width="84" height="20" uuid="8c64572e-b38e-48b9-9764-cf5d940de5ff"/>
+					<textElement>
+						<font fontName="TH SarabunPSK" size="14"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{SUPPLIERCODE}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="87" y="189" width="472" height="20" uuid="baf83df8-6553-456b-863d-81e19ae5064f"/>
+					<textElement>
+						<font fontName="TH SarabunPSK" size="14"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{SUPPLIERNAME}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="83">
+				<textField pattern="#,##0.00">
+					<reportElement x="478" y="41" width="79" height="17" uuid="c61be509-8247-4cc2-9f93-4609b8c21325"/>
+					<textElement textAlignment="Center">
+						<font fontName="TH SarabunPSK" size="14"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{SUMVAT}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="478" y="22" width="79" height="16" uuid="c1e1c7ed-ae18-43c7-b945-3ba3d5c2a39f"/>
+					<textElement textAlignment="Center">
+						<font fontName="TH SarabunPSK" size="14"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{SUMSUBTOTAL}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="478" y="2" width="79" height="16" uuid="e2a1966a-8fc5-4e19-9667-9df7fbcb6af8"/>
+					<textElement textAlignment="Center">
+						<font fontName="TH SarabunPSK" size="14"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{DISCOUNT}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement x="478" y="63" width="78" height="20" uuid="bdaeced5-4470-49c8-b0a1-546c062f4281"/>
+					<textElement textAlignment="Center">
+						<font fontName="TH SarabunPSK" size="14"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{SUMTOTAL}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="21" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="27" y="0" width="24" height="20" isRemoveLineWhenBlank="true" uuid="5bcb7284-7e12-4da2-b8d5-a0b660e71bf6"/>
+				<textElement textAlignment="Center">
+					<font fontName="TH SarabunPSK" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ROWNUM}.intValue() % $F{ROW_SPLIT}.intValue()]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="51" y="0" width="75" height="20" isRemoveLineWhenBlank="true" uuid="822d23d7-f4a8-4cd6-85e2-41bcd53a11ea"/>
+				<textElement>
+					<font fontName="TH SarabunPSK" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ITEMCODE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="345" y="0" width="43" height="20" isRemoveLineWhenBlank="true" uuid="5b58d893-ce19-4971-a739-855f2dcacf01"/>
+				<textElement textAlignment="Center">
+					<font fontName="TH SarabunPSK" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{QUANTITY}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="388" y="0" width="90" height="20" isRemoveLineWhenBlank="true" uuid="f86ed1db-73e1-4512-b16b-06170eed8306"/>
+				<textElement textAlignment="Center">
+					<font fontName="TH SarabunPSK" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{UNITPRICE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="477" y="0" width="80" height="20" isRemoveLineWhenBlank="true" uuid="24e4afe9-2224-4d18-afbd-ac90fb19e37d"/>
+				<textElement textAlignment="Center">
+					<font fontName="TH SarabunPSK" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EPRL_AMT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="126" y="0" width="218" height="20" isRemoveLineWhenBlank="true" uuid="75d88d64-2e78-44a3-b165-3bb93c3a6162"/>
+				<textElement>
+					<font fontName="TH SarabunPSK" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="-18" y="0" width="21" height="20" isRemoveLineWhenBlank="true" uuid="edadbcf0-f86c-4f2f-ac27-733570ae0908"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="TH SarabunPSK"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ROWNUM}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="3" y="0" width="24" height="20" isRemoveLineWhenBlank="true" uuid="cb8cd98f-fd64-4cfc-8ef2-c084126eb4c6"/>
+				<textElement textAlignment="Center">
+					<font fontName="TH SarabunPSK" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ROWNUM}.intValue() < $F{TOTAL_PAGE}.intValue() ? "true" : "false"]]></textFieldExpression>
+			</textField>
+			<break>
+				<reportElement x="0" y="20" width="99" height="1" isRemoveLineWhenBlank="true" uuid="7e8af2ac-e028-48df-b35c-0f7d8f457a33">
+					<printWhenExpression><![CDATA[$F{ROWNUM}.intValue() < $F{TOTAL_PAGE}.intValue() && $F{ROWNUM}.intValue() % $F{ROW_SPLIT}.intValue() == 0]]></printWhenExpression>
+				</reportElement>
+			</break>
+		</band>
+	</detail>
+	<pageFooter>
+		<band/>
+	</pageFooter>
+</jasperReport>
