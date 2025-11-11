@@ -155,6 +155,7 @@ public class Insert {
         return mJSonArr2;
 
     }
+    String supplierresult;
 
     public static JSONArray InsertPrvForm(
             String EPPA_NO, String EPRA_PHNO, String app, String cono, String divi
@@ -166,7 +167,7 @@ public class Insert {
         JSONArray mJSonArr2 = new JSONArray();
         Connection conn = ConnectDB2.ConnectionDB();
         String StrInsertHeader = null;
-
+        String supplierresult = "";
         try {
             if (conn != null) {
                 String query2 = null;
@@ -324,6 +325,8 @@ public class Insert {
                         ValueOfGrn[10] = String.valueOf(grnp_char);
                         ValueOfGrn[11] = grnp_desc;
                         ValueOfGrn[12] = itemcode;
+                        
+                        supplierresult = epra_suno;
                         double value4 = 0;
                         boolean typeGRN = false;
 //                        if (cono.equalsIgnoreCase("600")) {
@@ -417,6 +420,7 @@ public class Insert {
                         Rdiscount = Double.parseDouble(ValueOfGrn[9]);
                         Charge = Double.parseDouble(ValueOfGrn[10]);
                         Vat = Double.parseDouble(ValueOfGrn[5]);
+//                        String epra_suno = ValueOfGrn[0];
                         StrInsertHeader = "INSERT INTO " + dbname + ".PAYMENTLINEGRN(GRNP_CONO,GRNP_DIVI,GRNP_NO,GRNP_GRN\n"
                                 + ",GRNP_GRND,GRNP_PO,GRNP_INVC\n"
                                 + ",GRNP_COST,GRNP_DESC,GRNP_DISC,GRNP_CHAR,GRNP_AMTB,GRNP_VATT,GRNP_AMTT)\n"
@@ -437,6 +441,7 @@ public class Insert {
 //                    Ordernum = EPRH_NO.trim() + " Has Been Updated";
                 Map<String, Object> mMap2 = new HashMap<>();
                 mMap2.put("Result", "Ok");
+                mMap2.put("Supplier", supplierresult);
                 mJSonArr2.put(mMap2);
 
             } else {
