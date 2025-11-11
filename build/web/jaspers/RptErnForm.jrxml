@@ -15,11 +15,11 @@
 	<parameter name="cono" class="java.lang.String"/>
 	<parameter name="divi" class="java.lang.String"/>
 	<queryString>
-		<![CDATA[ SELECT CCROW3,h.EPRH_PO,h.EPRH_PHNO,h.EPRH_COCE AS CostCenter,h.EPRH_PURPOS as PurposeSample,   
+		<![CDATA[SELECT CCROW3,h.EPRH_PO,h.EPRH_PHNO,h.EPRH_COCE AS CostCenter,h.EPRH_PURPOS as PurposeSample,   
  	  SUBSTR(h.EPRH_TRDT,7,2) CONCAT '/' CONCAT SUBSTR(h.EPRH_TRDT,5,2) CONCAT '/' CONCAT SUBSTR(h.EPRH_TRDT,1,4)
  as DATES,  SUBSTR(EPRH_RQRDT,7,2) CONCAT '/' CONCAT SUBSTR(EPRH_RQRDT,5,2) CONCAT '/' CONCAT SUBSTR(EPRH_RQRDT,1,4)  
  as DueDate ,h.eprh_suno as SupplierCode  
- ,sup.idsunm as SupplierName ,h.eprh_invsu as InvoiceNo ,h.eprh_aptno as ContractNo
+ ,sup.SASUNM as SupplierName ,h.eprh_invsu as InvoiceNo ,h.eprh_aptno as ContractNo
    ,h.EPRH_PHNO as ServiceRequestNo,d.eprl_pnli as Numberno
  , EPRL_ITNO as ItemCode, EPRL_DESC Description , ROUND( EPRL_QTY,2) as Quantity
  , ROUND(EPRL_UPRICE,2) as UnitPrice , ROUND(EPRL_VTCD,2), ROUND(EPRL_VAT,2),ROUND(EPRL_UPRICE * EPRL_QTY,2) as EPRL_AMT 
@@ -27,9 +27,10 @@
  ,ROUND(EPRH_VTAMT,2) as SumVat ,ROUND(EPRH_TOTAL-h.EPRH_DISC+EPRH_VTAMT,2) as SumTotal,costcenter.eatx40 as CostCenterName
  FROM brldta0100.SERVICEHEAD as h
  LEFT JOIN  brldta0100.SERVICELINE as d  ON h.EPRH_PHNO=d.EPRL_PHNO AND h.EPRH_CONO = d.EPRL_CONO AND h.EPRH_DIVI = d.EPRL_DIVI
- LEFT JOIN  (SELECT idcono,idsuno,idsunm
-             FROM m3fdbprd.cidmas
-             WHERE idstat='20')as sup ON sup.idsuno=h.eprh_suno  AND sup.idcono = h.eprh_cono
+ LEFT JOIN  ( select sasunm,sasuno,SACONO 
+ FROM  m3fdbprd.cidadr
+ where  saadte = '2' 
+ and saadid = 'ENAME')as sup ON sup.sasuno=h.eprh_suno  AND sup.SACONO = h.eprh_cono
  LEFT JOIN  (SELECT eadivi,eacono,eaaitm,eatx40
              FROM m3fdbprd.fchacc
              WHERE eaaitp =  2)as costcenter ON costcenter.eaaitm=h.EPRH_COCE  AND costcenter.eacono = h.EPRH_CONO AND costcenter.eadivi = h.EPRH_DIVI 
