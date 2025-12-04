@@ -652,7 +652,7 @@
     $("#vSubmit").click(function () {
         const label = document.getElementById("SupplierUnmatched");
         if ($('#vSupplierUnmatched').is(':visible')) {
-            alert('Supplier ไม่ตรงกับ GRNที่เพิ่ม(หากถูกต้องอยู่แล้วไม่ต้องสนข้อความนี้)');
+            alert('Supplier ไม่ตรงกับ GRNที่เพิ่ม');
         }
         var ordernum = encodeURIComponent($("#vOrdernum").val());
         if (app === "ERN") {
