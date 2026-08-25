@@ -643,9 +643,10 @@ public class Select {
                 Statement stmt = conn.createStatement();
                 String query1 = "SELECT TRIM(MMITNO)||' : ' ||MMITDS    \n"
                         + "FROM " + dbM3Name + ".MITMAS \n"
-                        + "WHERE SUBSTR(MMITNO,1,2) = 'OH' \n"
+                        + "WHERE (SUBSTR(MMITNO,1,2) = 'OH' \n"
+                        + "OR  SUBSTR(MMITNO,1,2) = 'EL')\n"
                         + "AND MMCONO='" + cono + "' \n"
-                        + "AND MMITTY IN ('OH') \n"
+                        + "AND MMITTY IN ('OH','EX') \n"
                         + " ORDER BY MMITNO";
                 System.out.println("Getsupplier\n" + query1);
                 ResultSet mRes1 = stmt.executeQuery(query1);
